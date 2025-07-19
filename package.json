@@ -29,7 +29,15 @@
     "postinstall": "bun run build:shared",
     "deploy:client": "cd client && orbiter deploy",
     "deploy:server": "cd server && bun run deploy",
-    "create:superuser": "cd server && bun run create:superuser"
+    "create:superuser": "cd server && bun run create:superuser",
+    "expo:start": "cd mobile && expo start",
+    "expo:dev": "cd mobile && expo start -c",
+    "expo:reset-project": "cd mobile && node ./scripts/reset-project.js",
+    "expo:android": "cd mobile && DARK_MODE=media expo start --android",
+    "expo:ios": "cd mobile && DARK_MODE=media expo start --ios",
+    "expo:web": "cd mobile && DARK_MODE=media expo start --web",
+    "expo:lint": "cd mobile && expo lint",
+    "expo:ui:add": "npx gluestack-ui add"
   },
   "keywords": [
     "bun",
