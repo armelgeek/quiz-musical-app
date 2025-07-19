@@ -9,6 +9,7 @@ export const User = z.object({
   emailVerified: z.boolean(),
   image: z.string().optional(),
   isAdmin: z.boolean(),
+  xp: z.string().or(z.number()).default('0'),
   createdAt: z.string().or(z.date()),
   updatedAt: z.string().or(z.date())
 })

@@ -11,4 +11,5 @@ export interface UserRepositoryInterface {
   save: (user: z.infer<typeof User>) => Promise<z.infer<typeof User>>
   update: (id: string, data: Partial<z.infer<typeof User>>) => Promise<z.infer<typeof User> | null>
   remove: (id: string) => Promise<boolean>
+  findTopByXp: (limit?: number) => Promise<z.infer<typeof User>[]>
 }

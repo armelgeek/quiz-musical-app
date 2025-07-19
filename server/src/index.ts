@@ -1,8 +1,8 @@
 import process from 'node:process'
 import { App } from './app'
-import { PermissionController, UserController } from './infrastructure/controllers'
+import { QuizProgressController, UserController } from './infrastructure/controllers'
 
-const app = new App([new UserController(), new PermissionController()]).getApp()
+const app = new App([new UserController(), new QuizProgressController()]).getApp()
 
 const port = Number(process.env.PORT) || 3000
 

@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
 import {
   DeleteUserUseCase,
   GetAllUsersUseCase,
+  GetTopUsersByXpUseCase,
   GetUserByEmailUseCase,
   GetUserByIdUseCase,
   UpdateUserUseCase
@@ -39,6 +40,46 @@ export class UserController implements Routes {
   private UserUpdateSchema = this.UserSchema.partial().omit({ id: true, createdAt: true })
 
   public initRoutes() {
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/users/top-xp',
+        tags: ['User'],
+        summary: 'Top utilisateurs par XP',
+        description: "Récupère les 20 utilisateurs avec le plus de points d'expérience (xp)",
+        operationId: 'getTopUsersByXp',
+        request: {
+          query: z.object({ limit: z.string().optional() })
+        },
+        responses: {
+          200: {
+            description: 'Top utilisateurs par XP',
+            content: {
+              'application/json': {
+                schema: z.object({
+                  success: z.boolean(),
+                  users: z.array(this.UserSchema.extend({ xp: z.number() }))
+                })
+              }
+            }
+          },
+          500: {
+            description: 'Erreur serveur',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), error: z.string() })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const getTopUsersByXp = new GetTopUsersByXpUseCase(this.userRepo)
+        const limit = c.req.query('limit') ? Number(c.req.query('limit')) : 20
+        const result = await getTopUsersByXp.execute(limit)
+        return c.json(result, result.success ? 200 : 500)
+      }
+    )
     this.controller.openapi(
       createRoute({
         method: 'get',
