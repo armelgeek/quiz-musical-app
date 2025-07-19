@@ -28,7 +28,7 @@ export class GetQuizByIdUseCase {
 
 export class GetQuizzesByUserUseCase {
   constructor(private quizRepo: QuizRepositoryInterface) {}
-  async execute(userId: number) {
+  async execute(userId: string) {
     const quizzes = await this.quizRepo.findByUser(userId)
     return { success: true, quizzes }
   }
@@ -44,7 +44,7 @@ export class CreateQuizUseCase {
 
 export class UpdateQuizUseCase {
   constructor(private quizRepo: QuizRepositoryInterface) {}
-  async execute(quizId: number, userId: number, update: Partial<Quiz>) {
+  async execute(quizId: number, userId: string, update: Partial<Quiz>) {
     const updated = await this.quizRepo.update(quizId, userId, update)
     if (!updated) return { success: false, error: 'Quiz not found or unauthorized' }
     return { success: true, quiz: updated }
@@ -53,7 +53,7 @@ export class UpdateQuizUseCase {
 
 export class DeleteQuizUseCase {
   constructor(private quizRepo: QuizRepositoryInterface) {}
-  async execute(quizId: number, userId: number) {
+  async execute(quizId: number, userId: string) {
     const deleted = await this.quizRepo.deleteQuiz(quizId, userId)
     if (!deleted) return { success: false, error: 'Quiz not found or unauthorized' }
     return { success: true }
@@ -62,7 +62,7 @@ export class DeleteQuizUseCase {
 
 export class UpdateQuizIsPublicUseCase {
   constructor(private quizRepo: QuizRepositoryInterface) {}
-  async execute(quizId: number, userId: number, isPublic: boolean) {
+  async execute(quizId: number, userId: string, isPublic: boolean) {
     const updated = await this.quizRepo.updateIsPublic(quizId, userId, isPublic)
     if (!updated) return { success: false, error: 'Quiz not found or unauthorized' }
     return { success: true, quiz: updated }

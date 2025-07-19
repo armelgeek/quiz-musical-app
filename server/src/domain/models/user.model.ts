@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { UserBadge } from './badge.model'
 
 export const User = z.object({
   id: z.string(),
@@ -10,6 +11,7 @@ export const User = z.object({
   image: z.string().optional(),
   isAdmin: z.boolean(),
   xp: z.string().or(z.number()).default('0'),
+  badges: z.array(UserBadge).optional(),
   createdAt: z.string().or(z.date()),
   updatedAt: z.string().or(z.date())
 })

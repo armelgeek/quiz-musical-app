@@ -7,6 +7,12 @@ import {
   GetUserByIdUseCase,
   UpdateUserUseCase
 } from '../../application/use-cases/user'
+import {
+  AwardBadgeToUserUseCase,
+  GetAllBadgesUseCase,
+  GetUserBadgesUseCase
+} from '../../application/use-cases/user/badge.usecase'
+import { BadgeRepository } from '../repositories/badge.repository'
 import { UserRepository } from '../repositories/user.repository'
 import type { Routes } from '../../domain/types/route.type'
 
@@ -17,13 +23,31 @@ export class UserController implements Routes {
     this.controller = new OpenAPIHono()
     this.initRoutes()
   }
-
   private userRepo = new UserRepository()
+  private badgeRepo = new BadgeRepository()
   private getAllUsers = new GetAllUsersUseCase(this.userRepo)
   private getUserById = new GetUserByIdUseCase(this.userRepo)
   private getUserByEmail = new GetUserByEmailUseCase(this.userRepo)
   private updateUser = new UpdateUserUseCase(this.userRepo)
   private deleteUser = new DeleteUserUseCase(this.userRepo)
+  private getAllBadges = new GetAllBadgesUseCase(this.badgeRepo)
+  private getUserBadges = new GetUserBadgesUseCase(this.badgeRepo)
+  private awardBadgeToUser = new AwardBadgeToUserUseCase(this.badgeRepo, this.userRepo)
+  private BadgeSchema = z.object({
+    id: z.string().openapi({ example: 'first_win' }),
+    name: z.string().openapi({ example: 'First Win' }),
+    description: z.string().openapi({ example: 'Awarded for your first win.' }),
+    icon: z.string().optional().openapi({ example: '🥇' }),
+    createdAt: z.string().openapi({ example: '2025-05-06T16:34:49.937Z' }),
+    updatedAt: z.string().openapi({ example: '2025-05-06T16:34:49.937Z' })
+  })
+  private UserBadgeSchema = z.object({
+    id: z.number().openapi({ example: 1 }),
+    userId: z.string().openapi({ example: 'user_ABC123' }),
+    badgeId: z.string().openapi({ example: 'first_win' }),
+    awardedAt: z.string().openapi({ example: '2025-05-06T16:34:49.937Z' }),
+    badge: z.any().optional()
+  })
 
   private UserSchema = z.object({
     id: z.string().openapi({ example: 'user_ABC123' }),
@@ -35,11 +59,112 @@ export class UserController implements Routes {
     image: z.string().optional().openapi({ example: 'https://example.com/avatar.jpg' }),
     isAdmin: z.boolean().openapi({ example: false }),
     createdAt: z.string().openapi({ example: '2025-05-06T16:34:49.937Z' }),
+
     updatedAt: z.string().openapi({ example: '2025-05-06T16:34:49.937Z' })
   })
   private UserUpdateSchema = this.UserSchema.partial().omit({ id: true, createdAt: true })
 
   public initRoutes() {
+    // Badge endpoints
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/badges',
+        tags: ['Badge'],
+        summary: 'Liste des badges',
+        description: 'Récupère la liste de tous les badges disponibles',
+        operationId: 'getAllBadges',
+        responses: {
+          200: {
+            description: 'Liste des badges',
+            content: {
+              'application/json': {
+                schema: z.object({
+                  success: z.boolean(),
+                  badges: z.array(this.BadgeSchema)
+                })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const result = await this.getAllBadges.execute()
+        return c.json(result)
+      }
+    )
+
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/users/:id/badges',
+        tags: ['Badge'],
+        summary: 'Liste des badges utilisateur',
+        description: 'Récupère la liste des badges obtenus par un utilisateur',
+        operationId: 'getUserBadges',
+        request: { params: z.object({ id: z.string() }) },
+        responses: {
+          200: {
+            description: 'Liste des badges utilisateur',
+            content: {
+              'application/json': {
+                schema: z.object({
+                  success: z.boolean(),
+                  badges: z.array(this.UserBadgeSchema)
+                })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const userId = c.req.param('id')
+        const result = await this.getUserBadges.execute(userId)
+        return c.json(result)
+      }
+    )
+
+    this.controller.openapi(
+      createRoute({
+        method: 'post',
+        path: '/users/:id/badges',
+        tags: ['Badge'],
+        summary: 'Attribuer un badge à un utilisateur',
+        description: 'Attribue un badge à un utilisateur',
+        operationId: 'awardBadgeToUser',
+        request: {
+          params: z.object({ id: z.string() }),
+          body: {
+            content: {
+              'application/json': {
+                schema: z.object({ badgeId: z.string() })
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Badge attribué',
+            content: {
+              'application/json': {
+                schema: z.object({
+                  success: z.boolean(),
+                  userBadge: this.UserBadgeSchema.optional(),
+                  error: z.string().optional()
+                })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const userId = c.req.param('id')
+        const { badgeId } = await c.req.json()
+        const result = await this.awardBadgeToUser.execute(userId, badgeId)
+        return c.json(result)
+      }
+    )
+    // End badge endpoints
     this.controller.openapi(
       createRoute({
         method: 'get',

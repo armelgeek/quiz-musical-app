@@ -19,6 +19,8 @@ import {
 import { GameSessionRepository } from '../repositories/game-session.repository'
 import { QuizRepository } from '../repositories/quiz.repository'
 import type { Routes } from '../../domain/types/route.type'
+import { UserRepository } from '../repositories/user.repository'
+import { BadgeRepository } from '../repositories/badge.repository'
 
 const GameSessionSchema = z.object({
   id: z.number(),
@@ -65,7 +67,9 @@ export class QuizController implements Routes {
   private gameSessionRepo = new GameSessionRepository()
   private startGameSession = new StartGameSessionUseCase(this.gameSessionRepo, this.quizRepo)
   private getActiveGameSession = new GetActiveGameSessionUseCase(this.gameSessionRepo)
-  private completeGameSession = new CompleteGameSessionUseCase(this.gameSessionRepo)
+  private badgeRepo = new BadgeRepository()
+  private userRepo = new UserRepository()
+  private completeGameSession = new CompleteGameSessionUseCase(this.gameSessionRepo, this.badgeRepo, this.userRepo)
   private getGameSessionById = new GetGameSessionByIdUseCase(this.gameSessionRepo)
   private getGameSessionHistory = new GetGameSessionHistoryUseCase(this.gameSessionRepo)
   private getAllQuizzes = new GetAllQuizzesUseCase(this.quizRepo)

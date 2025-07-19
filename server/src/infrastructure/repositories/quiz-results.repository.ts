@@ -3,7 +3,6 @@ import { db } from '../database/db'
 import { quizResults } from '../database/schema/quiz'
 
 export class QuizResultsRepository {
-  /** Classement générique (all, day, week, month) */
   async getLeaderboard(period: 'all' | 'day' | 'week' | 'month', limit?: number) {
     let where = undefined
     const now = new Date()
@@ -25,12 +24,10 @@ export class QuizResultsRepository {
       .orderBy(desc(sql`SUM(${quizResults.score})`))
     if (where) query.where(where)
     if (limit) query.limit(limit)
-  const results = await query
-  // Cast totalScore to number for type safety
-  return results.map(r => ({ ...r, totalScore: Number(r.totalScore) }))
+    const results = await query
+    return results.map((r) => ({ ...r, totalScore: Number(r.totalScore) }))
   }
 
-  /** Podium du jour (top 3) */
   getPodiumOfDay() {
     return this.getLeaderboard('day', 3)
   }

@@ -1,22 +1,14 @@
-import process from 'node:process'
+
 import { count, eq, sql } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
 import type { UserType } from '@/domain/models/user.model'
 import type { UserRepositoryInterface } from '@/domain/repositories/user.repository.interface'
+import { db } from '../database/db'
 import { users } from '../database/schema/auth'
 
 export class UserRepository implements UserRepositoryInterface {
-  private db: ReturnType<typeof drizzle>
-
-  constructor() {
-    const connectionString = process.env.DATABASE_URL!
-    const client = postgres(connectionString)
-    this.db = drizzle(client)
-  }
 
   async findById(id: string): Promise<UserType | null> {
-    const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1)
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1)
     if (!result.length) return null
     return {
       ...result[0],
@@ -30,7 +22,7 @@ export class UserRepository implements UserRepositoryInterface {
   }
 
   async findByEmail(email: string): Promise<UserType | null> {
-    const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1)
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1)
     if (!result.length) return null
     return {
       ...result[0],
@@ -49,8 +41,8 @@ export class UserRepository implements UserRepositoryInterface {
   ): Promise<{ items: UserType[]; total: number; page: number; limit: number; totalPages: number }> {
     const offset = (page - 1) * limit
     const [items, totalResult] = await Promise.all([
-      this.db.select().from(users).limit(limit).offset(offset),
-      this.db.select({ count: count() }).from(users)
+      db.select().from(users).limit(limit).offset(offset),
+      db.select({ count: count() }).from(users)
     ])
     const total = totalResult[0].count
     const totalPages = Math.ceil(total / limit)
@@ -81,7 +73,7 @@ export class UserRepository implements UserRepositoryInterface {
       createdAt: new Date(user.createdAt),
       updatedAt: new Date(user.updatedAt)
     }
-    const result = await this.db.insert(users).values(userData).returning()
+  const result = await db.insert(users).values(userData).returning()
     return {
       ...result[0],
       xp: typeof result[0].xp === 'string' ? Number.parseInt(result[0].xp, 10) : (result[0].xp ?? 0),
@@ -105,7 +97,7 @@ export class UserRepository implements UserRepositoryInterface {
     if (data.emailVerified !== undefined) updateData.emailVerified = data.emailVerified
     if (data.isAdmin !== undefined) updateData.isAdmin = data.isAdmin
     if (data.xp !== undefined) updateData.xp = String(data.xp)
-    const result = await this.db.update(users).set(updateData).where(eq(users.id, id)).returning()
+  const result = await db.update(users).set(updateData).where(eq(users.id, id)).returning()
     if (!result.length) return null
     return {
       ...result[0],
@@ -119,12 +111,12 @@ export class UserRepository implements UserRepositoryInterface {
   }
 
   async remove(id: string): Promise<boolean> {
-    const result = await this.db.delete(users).where(eq(users.id, id)).returning()
+  const result = await db.delete(users).where(eq(users.id, id)).returning()
     return result.length > 0
   }
 
   async findTopByXp(limit: number = 20): Promise<UserType[]> {
-    const items = await this.db
+    const items = await db
       .select()
       .from(users)
       .orderBy(sql`CAST(${users.xp} AS INTEGER) DESC`)
