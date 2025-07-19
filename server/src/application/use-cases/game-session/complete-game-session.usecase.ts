@@ -1,3 +1,4 @@
+import { emitBadgeBroadcast, emitBadgeNotification } from '@/infrastructure/ws/notification.ws'
 import type { UserRepositoryInterface } from '@/domain/repositories/user.repository.interface'
 import type { BadgeRepository } from '@/infrastructure/repositories/badge.repository'
 import type { GameSession } from '../../../domain/models/game-session.model'
@@ -28,11 +29,17 @@ export class CompleteGameSessionUseCase {
     // --- 1. First win badge ---
     const firstWinBadgeId = 'first_win'
     const firstWinBadge = await this.badgeRepository.getBadgeById(firstWinBadgeId)
+    // Get username for broadcast (optional, fallback to userId)
+    let username = userId
+    const user = await this.userRepository.findById(userId)
+    if (user && user.firstname) username = user.firstname
     if (firstWinBadge) {
       const hasFirstWin = await this.badgeRepository.hasUserBadge(userId, firstWinBadgeId)
       if (!hasFirstWin) {
         const awarded = await this.badgeRepository.awardBadgeToUser(userId, firstWinBadgeId)
         badgesAwarded.push(awarded)
+        emitBadgeNotification(userId, awarded)
+        emitBadgeBroadcast(userId, username, awarded)
       }
     }
 
@@ -59,6 +66,8 @@ export class CompleteGameSessionUseCase {
           if (!hasBadge) {
             const awarded = await this.badgeRepository.awardBadgeToUser(userId, badgeInfo.id)
             badgesAwarded.push(awarded)
+            emitBadgeNotification(userId, awarded)
+            emitBadgeBroadcast(userId, username, awarded)
           }
         }
       }

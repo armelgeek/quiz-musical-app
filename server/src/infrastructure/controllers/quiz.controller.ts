@@ -16,11 +16,11 @@ import {
   UpdateQuizIsPublicUseCase,
   UpdateQuizUseCase
 } from '../../application/use-cases/quiz'
+import { BadgeRepository } from '../repositories/badge.repository'
 import { GameSessionRepository } from '../repositories/game-session.repository'
 import { QuizRepository } from '../repositories/quiz.repository'
-import type { Routes } from '../../domain/types/route.type'
 import { UserRepository } from '../repositories/user.repository'
-import { BadgeRepository } from '../repositories/badge.repository'
+import type { Routes } from '../../domain/types/route.type'
 
 const GameSessionSchema = z.object({
   id: z.number(),
