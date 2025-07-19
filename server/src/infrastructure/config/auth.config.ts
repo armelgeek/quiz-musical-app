@@ -36,7 +36,11 @@ export const auth = betterAuth({
     additionalFields: {
       firstname: { type: 'string', default: '', returned: true },
       lastname: { type: 'string', default: '', returned: true },
-      isAdmin: { type: 'boolean', default: false, returned: true }
+      isAdmin: { type: 'boolean', default: false, returned: true },
+      rank: { type: 'string', default: '🥚 Brainy Beginnings', returned: true },
+      favouriteTopic: { type: 'string', default: '', returned: true },
+      level: { type: 'string', default: '', returned: true },
+      xp: { type: 'string', default: '', returned: true }
     },
     changeEmail: {
       enabled: true,
