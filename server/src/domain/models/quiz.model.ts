@@ -16,7 +16,7 @@ export interface Quiz {
   topic: string
   duration: string
   code: string
-  createdBy: number
+  createdBy: string
   isPublic: boolean
   questions: QuizQuestion[]
   createdAt: string

@@ -12,7 +12,7 @@ export const quizzes = pgTable('quizzes', {
   topic: varchar('topic', { length: 255 }).notNull(),
   duration: varchar('duration', { length: 50 }).notNull(),
   code: varchar('code', { length: 255 }).notNull().unique(),
-  createdBy: integer('created_by')
+  createdBy: text('created_by')
     .notNull()
     .references(() => users.id),
   isPublic: boolean('is_public').default(true),

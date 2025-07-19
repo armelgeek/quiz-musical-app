@@ -9,6 +9,7 @@ import { responseMiddleware } from './infrastructure/middlewares/response.middle
 import addSession from './infrastructure/middlewares/session.middleware'
 import sessionValidator from './infrastructure/middlewares/unauthorized-access.middleware'
 import { Home } from './infrastructure/pages/home'
+
 import type { Routes } from './domain/types'
 
 export class App {
@@ -39,6 +40,8 @@ export class App {
     })
     this.app.basePath('/api').route('/', router)
     this.app.route('/', Home)
+
+  // WebSocket handled by Socket.IO at the server level
   }
 
   private initializeGlobalMiddlewares() {
