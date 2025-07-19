@@ -10,6 +10,10 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').notNull(),
   image: text('image'),
   isAdmin: boolean('is_admin').notNull().default(false),
+  rank: text('rank').default('🥚 Brainy Beginnings'),
+  favouriteTopic: text('favourite_topic'),
+  level: text('level'),
+  xp: text('xp'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull()
 })
@@ -64,19 +68,6 @@ export const activityLogs = pgTable('activity_logs', {
   ipAddress: varchar('ip_address', { length: 45 })
 })
 
-export const subscriptionHistory = pgTable('subscription_history', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  action: text('action').notNull(),
-  oldPlan: text('old_plan'),
-  newPlan: text('new_plan'),
-  amount: text('amount'),
-  currency: text('currency'),
-  status: text('status').notNull(),
-  timestamp: timestamp('timestamp').notNull().defaultNow()
-})
 
 export const roles = pgTable('roles', {
   id: text('id').primaryKey(),

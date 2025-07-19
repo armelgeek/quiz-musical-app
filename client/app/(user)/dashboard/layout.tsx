@@ -4,19 +4,13 @@ import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { DashboardContextualNav } from "@/features/dashboard/components/dashboard-contextual-nav";
-import { DashboardNotifications } from "@/features/dashboard/components/dashboard-notifications";
 import { 
   Home,
   User,
-  Calendar,
   Settings,
   LogOut,
   HelpCircle,
   Bell,
-  CreditCard,
-  Clock,
-  FileText,
   Menu,
   X
 } from "lucide-react";
@@ -32,10 +26,6 @@ interface NavigationItem {
   const navigationItems: NavigationItem[] = [
     { icon: Home, label: "Accueil", href: "/dashboard" },
     { icon: User, label: "Profil", href: "/dashboard/profile" },
-    { icon: FileText, label: "Documents", href: "/dashboard/documents" },
-    { icon: Calendar, label: "Planning", href: "/dashboard/calendar" },
-    { icon: CreditCard, label: "Facturation", href: "/dashboard/billing" },
-    { icon: Clock, label: "Historique", href: "/dashboard/history" },
     { icon: Settings, label: "Paramètres", href: "/dashboard/settings" },
   ];
 
@@ -89,11 +79,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
               
-              {/* Navigation contextuelle */}
-              <DashboardContextualNav />
-              
-              {/* Notifications */}
-              <DashboardNotifications />
               
               <Button 
                 variant="outline" 

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752596141353,
-      "tag": "0000_romantic_lethal_legion",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752604715979,
-      "tag": "0001_clammy_zeigeist",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752650583445,
-      "tag": "0002_abandoned_darkstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752659523073,
-      "tag": "0003_shallow_firedrake",
+      "when": 1752954428682,
+      "tag": "0000_faithful_lord_tyger",
       "breakpoints": true
     }
   ]

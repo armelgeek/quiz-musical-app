@@ -1,17 +1,7 @@
 import { relations, type InferModel } from 'drizzle-orm'
 import { roles, userRoles } from './auth'
 
-export {
-  accounts,
-  activityLogs,
-  roleResources,
-  roles,
-  sessions,
-  subscriptionHistory,
-  userRoles,
-  users,
-  verifications
-} from './auth'
+export { accounts, activityLogs, roleResources, roles, sessions, userRoles, users, verifications } from './auth'
 
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
   user: one(roles, {
@@ -24,8 +14,7 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
   })
 }))
 
-export { blog } from './blog'
-export { blogCategories, categories } from './category'
+export { quizProgress, quizResults, quizzes } from './quiz'
 
 export type Role = InferModel<typeof roles>
 export type UserRole = InferModel<typeof userRoles>

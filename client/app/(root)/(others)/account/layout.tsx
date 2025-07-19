@@ -18,7 +18,7 @@ export default function Layout({ children }: Props) {
       <div className="flex-1">
           {children}
       </div>
-      <Footer variant="minimal" showNewsletter={false} showStats={false} />
+      <Footer/>
     </div>
   );
 }

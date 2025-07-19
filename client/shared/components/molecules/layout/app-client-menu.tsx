@@ -53,7 +53,7 @@ const AppClientMenu = () => {
           <NavLink
             key={item.url}
             href={item.url}
-            className="font-semibold py-2 px-3 rounded transition-colors duration-150 hover:text-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="font-semibold py-2 px-3  transition-colors duration-150 hover:text-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             active={item.url === "/" ? pathname === "/" : pathname.startsWith(item.url)}
           >
             {item.title}

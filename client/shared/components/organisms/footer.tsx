@@ -176,7 +176,7 @@ export function Footer({
           <Separator className="my-8 bg-gray-800" />
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-sm text-gray-400 mb-4 md:mb-0">
-              © 2024 Boiler Transport. Tous droits réservés.
+              © 2024 Quiz Musical. Tous droits réservés.
             </div>
             {showSocial && (
               <div className="flex space-x-3">
@@ -308,7 +308,7 @@ export function Footer({
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-6 mb-4 md:mb-0">
               <div className="text-sm text-gray-400">
-                © 2024 Boiler Transport. Tous droits réservés.
+                © 2024 Quiz Musical. Tous droits réservés.
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">

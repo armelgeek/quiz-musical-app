@@ -76,7 +76,7 @@ const Logo = React.forwardRef<HTMLDivElement, LogoProps>(
         themeClasses[theme],
         textClassName
       )}>
-        Boiler
+        Quiz Musical
       </span>
     );
 
@@ -85,7 +85,7 @@ const Logo = React.forwardRef<HTMLDivElement, LogoProps>(
         "text-xs font-medium tracking-wide opacity-70",
         themeClasses[theme]
       )}>
-        Transport & Voyage
+        Quiz Musical
       </span>
     );
 
