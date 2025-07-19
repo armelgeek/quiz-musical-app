@@ -2,6 +2,8 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
 import {
   CompleteGameSessionUseCase,
   GetActiveGameSessionUseCase,
+  GetGameSessionByIdUseCase,
+  GetGameSessionHistoryUseCase,
   StartGameSessionUseCase
 } from '../../application/use-cases/game-session'
 import {
@@ -64,6 +66,8 @@ export class QuizController implements Routes {
   private startGameSession = new StartGameSessionUseCase(this.gameSessionRepo, this.quizRepo)
   private getActiveGameSession = new GetActiveGameSessionUseCase(this.gameSessionRepo)
   private completeGameSession = new CompleteGameSessionUseCase(this.gameSessionRepo)
+  private getGameSessionById = new GetGameSessionByIdUseCase(this.gameSessionRepo)
+  private getGameSessionHistory = new GetGameSessionHistoryUseCase(this.gameSessionRepo)
   private getAllQuizzes = new GetAllQuizzesUseCase(this.quizRepo)
   private getAllQuizzesWithSecret = new GetAllQuizzesWithSecretUseCase(this.quizRepo)
   private getQuizById = new GetQuizByIdUseCase(this.quizRepo)
@@ -98,6 +102,73 @@ export class QuizController implements Routes {
   })
 
   public initRoutes() {
+    // GET /game-sessions/:id
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/game-sessions/:id',
+        tags: ['GameSession'],
+        summary: 'Récupérer une session de jeu par ID',
+        request: { params: z.object({ id: z.string() }) },
+        responses: {
+          200: {
+            description: 'Session trouvée',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), session: GameSessionSchema, error: z.string().optional() })
+              }
+            }
+          },
+          404: {
+            description: 'Session non trouvée',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), error: z.string() })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const sessionId = Number(c.req.param('id'))
+        const result = await this.getGameSessionById.execute(sessionId)
+        return c.json(result, result.success ? 200 : 404)
+      }
+    )
+
+    // GET /game-sessions/history
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/game-sessions/history',
+        tags: ['GameSession'],
+        summary: 'Lister l’historique des sessions de l’utilisateur courant',
+        responses: {
+          200: {
+            description: 'Historique des sessions',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), sessions: z.array(GameSessionSchema) })
+              }
+            }
+          },
+          401: {
+            description: 'Non authentifié',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), error: z.string() })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const user = c.get('user')
+        if (!user) return c.json({ success: false, error: 'Unauthorized' }, 401)
+        const result = await this.getGameSessionHistory.execute(user.id)
+        return c.json(result)
+      }
+    )
     // GET /game-sessions/active
     this.controller.openapi(
       createRoute({

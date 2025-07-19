@@ -59,4 +59,30 @@ export class GameSessionRepository implements GameSessionRepositoryInterface {
       endedAt: updated.endedAt ? new Date(updated.endedAt).toISOString() : undefined
     }
   }
+
+  async findById(sessionId: number): Promise<GameSession | null> {
+    const result = await db.select().from(gameSessions).where(eq(gameSessions.id, sessionId))
+    if (!result.length) return null
+    const session = result[0]
+    return {
+      id: session.id,
+      userId: session.userId,
+      quizzes: session.quizzes as Quiz[],
+      status: session.status as 'active' | 'completed',
+      startedAt: session.startedAt ? new Date(session.startedAt).toISOString() : '',
+      endedAt: session.endedAt ? new Date(session.endedAt).toISOString() : undefined
+    }
+  }
+
+  async findAllByUser(userId: number): Promise<GameSession[]> {
+    const result = await db.select().from(gameSessions).where(eq(gameSessions.userId, userId))
+    return result.map(session => ({
+      id: session.id,
+      userId: session.userId,
+      quizzes: session.quizzes as Quiz[],
+      status: session.status as 'active' | 'completed',
+      startedAt: session.startedAt ? new Date(session.startedAt).toISOString() : '',
+      endedAt: session.endedAt ? new Date(session.endedAt).toISOString() : undefined
+    }))
+  }
 }

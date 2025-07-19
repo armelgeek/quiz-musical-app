@@ -1,3 +1,5 @@
 export * from './start-game-session.usecase'
 export * from './complete-game-session.usecase'
 export * from './get-active-game-session.usecase'
+export * from './get-game-session-by-id.usecase'
+export * from './get-game-session-history.usecase'
