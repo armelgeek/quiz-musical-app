@@ -28,7 +28,7 @@ export default function QuizDetailsPage({ params }: { params: Promise<{ code: st
 
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}/dashboard/quiz-details/${quiz?.code}`;
+    const shareUrl = `${window.location.origin}/quiz-details/${quiz?.code}`;
     if (navigator.share) {
       navigator.share({
         title: quiz?.title,

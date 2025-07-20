@@ -192,7 +192,7 @@ export default function MyQuizzesPage() {
 
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    href={`/dashboard/quiz-details/${quiz.code}`}
+                    href={`/quiz-details/${quiz.code}`}
                     className="inline-flex justify-center items-center bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
                   >
                     <Eye className="mr-1 w-4 h-4" /> Voir le quiz
