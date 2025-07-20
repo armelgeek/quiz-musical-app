@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Label } from "@/shared/components/atoms/ui/label";
 import { Switch } from "@/shared/components/atoms/ui/switch";
 import { 
-  Settings, 
   Bell, 
   Shield, 
   Palette,
@@ -16,21 +15,17 @@ import {
   Key,
   Smartphone,
   Mail,
-  Moon,
-  Sun,
-  Monitor
 } from "lucide-react";
 import { useState } from "react";
 
 export default function SettingsPage() {
-  const { isLoading, logout } = useAuth();
+  const { isLoading } = useAuth();
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
     sms: true,
     marketing: false
   });
-  const [theme, setTheme] = useState('system');
 
   if (isLoading) {
     return (
@@ -158,38 +153,6 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div>
-              <Label className="text-sm font-medium mb-3 block">
-                Thème de l&apos;interface
-              </Label>
-              <div className="grid grid-cols-3 gap-3">
-                <Button
-                  variant={theme === 'light' ? 'default' : 'outline'}
-                  className="flex flex-col gap-2 h-auto p-4"
-                  onClick={() => setTheme('light')}
-                >
-                  <Sun className="h-4 w-4" />
-                  <span className="text-xs">Clair</span>
-                </Button>
-                <Button
-                  variant={theme === 'dark' ? 'default' : 'outline'}
-                  className="flex flex-col gap-2 h-auto p-4"
-                  onClick={() => setTheme('dark')}
-                >
-                  <Moon className="h-4 w-4" />
-                  <span className="text-xs">Sombre</span>
-                </Button>
-                <Button
-                  variant={theme === 'system' ? 'default' : 'outline'}
-                  className="flex flex-col gap-2 h-auto p-4"
-                  onClick={() => setTheme('system')}
-                >
-                  <Monitor className="h-4 w-4" />
-                  <span className="text-xs">Auto</span>
-                </Button>
-              </div>
-            </div>
-
             <div>
               <Label className="text-sm font-medium">
                 Langue de l&apos;interface
@@ -323,47 +286,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Actions rapides */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Actions rapides</CardTitle>
-          <CardDescription>
-            Raccourcis pour les actions les plus courantes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="justify-start gap-2 h-auto p-4">
-              <Download className="h-5 w-5" />
-              <div className="text-left">
-                <p className="font-medium">Sauvegarder les données</p>
-                <p className="text-sm text-gray-600">Export complet</p>
-              </div>
-            </Button>
-            
-            <Button variant="outline" className="justify-start gap-2 h-auto p-4">
-              <Key className="h-5 w-5" />
-              <div className="text-left">
-                <p className="font-medium">Réinitialiser le mot de passe</p>
-                <p className="text-sm text-gray-600">Sécurité renforcée</p>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="justify-start gap-2 h-auto p-4 border-red-200 text-red-700 hover:bg-red-50"
-              onClick={() => logout()}
-            >
-              <Settings className="h-5 w-5" />
-              <div className="text-left">
-                <p className="font-medium">Se déconnecter</p>
-                <p className="text-sm text-red-600">Fermer la session</p>
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

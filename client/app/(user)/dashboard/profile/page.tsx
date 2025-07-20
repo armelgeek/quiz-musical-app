@@ -20,7 +20,6 @@ import { useState } from "react";
 export default function ProfilePage() {
   const { isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -31,7 +30,6 @@ export default function ProfilePage() {
   }
 
   const handleSave = () => {
-    // Logique de sauvegarde
     setIsEditing(false);
     console.log("Profil sauvegardé");
   };

@@ -16,11 +16,11 @@ const queryClient = new QueryClient();
 export function Provider({ children }: ProviderProps) {
   return (
     <KBar>
-       <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
+      <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-            <NuqsAdapter>{children}</NuqsAdapter>
-            <ReactQueryDevtools initialIsOpen={false} />
+              <NuqsAdapter>{children}</NuqsAdapter>
+              <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </AuthProvider>
       </ThemeProvider>
