@@ -34,8 +34,6 @@ const server = serve(
     console.info(`🔍 OpenAPI Schema: http://localhost:${port}/swagger`)
   }
 )
-// Attach WebSocket handlers
 attachBattleRoyaleSocket(server)
 attachNotificationSocket(server)
-// Attach multiplayer WebSocket handler
 attachMultiplayerSocket(server)

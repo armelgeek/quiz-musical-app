@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { BattleRoyaleSession } from '@/domain/models/battle-royale-session.model'
 import type { BattleRoyaleSessionRepositoryInterface } from '@/domain/repositories/battle-royale-session.repository.interface'
-import { db } from '../database/drizzle'
+import { db } from '../database/db'
 import { battleRoyaleSessions } from '../database/schema/battle-royale-session'
 export class BattleRoyaleSessionRepository implements BattleRoyaleSessionRepositoryInterface {
   async create(session: Omit<BattleRoyaleSession, 'id'>): Promise<BattleRoyaleSession> {

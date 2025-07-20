@@ -1,7 +1,8 @@
 import { Server as SocketIOServer } from 'socket.io'
 
 let io: SocketIOServer | null = null
-const userSocketMap: Map<string, string> = new Map()
+// userId -> Set<socketId>
+const userSockets: Map<string, Set<string>> = new Map()
 
 export function attachNotificationSocket(server: any) {
   if (io) return io
@@ -14,13 +15,26 @@ export function attachNotificationSocket(server: any) {
   })
 
   io.on('connection', (socket) => {
+    let registeredUserId: string | null = null
     // Expect client to send userId after connection
     socket.on('register', (userId: string) => {
-      userSocketMap.set(userId, socket.id)
+      registeredUserId = userId
+      if (!userSockets.has(userId)) {
+        userSockets.set(userId, new Set())
+      }
+      userSockets.get(userId)!.add(socket.id)
+      io?.emit('connected_count', userSockets.size)
     })
     socket.on('disconnect', () => {
-      for (const [userId, id] of userSocketMap.entries()) {
-        if (id === socket.id) userSocketMap.delete(userId)
+      if (registeredUserId) {
+        const sockets = userSockets.get(registeredUserId)
+        if (sockets) {
+          sockets.delete(socket.id)
+          if (sockets.size === 0) {
+            userSockets.delete(registeredUserId)
+          }
+        }
+        io?.emit('connected_count', userSockets.size)
       }
     })
   })
@@ -29,9 +43,11 @@ export function attachNotificationSocket(server: any) {
 
 export function emitBadgeNotification(userId: string, badge: any) {
   if (!io) return
-  const socketId = userSocketMap.get(userId)
-  if (socketId) {
-    io.to(socketId).emit('badge_awarded', badge)
+  const sockets = userSockets.get(userId)
+  if (sockets) {
+    for (const socketId of sockets) {
+      io.to(socketId).emit('badge_awarded', badge)
+    }
   }
 }
 
