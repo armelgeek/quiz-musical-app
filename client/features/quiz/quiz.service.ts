@@ -1,3 +1,5 @@
+
+// import { API_ENDPOINTS } from '@/shared/config/api';
 import { BaseServiceImpl } from '@/shared/domain/base.service';
 
 export interface Question {
@@ -60,6 +62,9 @@ export class QuizService extends BaseServiceImpl<Quiz, Partial<Quiz>> {
   async toggleVisibility(id: number, isPublic: boolean): Promise<Quiz> {
     return this.put<{ success: boolean; quiz: Quiz }>(`/api/quizzes/${id}/isPublic`, { isPublic })
       .then(res => res.quiz);
+  }
+  async getAllQuizzes(): Promise<Quiz[]> {
+    return this.get<{ success: boolean; quizzes: Quiz[] }>(`/quizzes`).then(res => res.quizzes);
   }
 }
 

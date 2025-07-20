@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
   user: {
     rank: "/rank"
   },
+  quizzes: "/quizzes",
 };

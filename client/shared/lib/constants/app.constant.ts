@@ -45,6 +45,14 @@ export const CLIENT_MENU_ITEMS: NavItem[] = [
   {
     title: "Accueil",
     url: "/",
+  },
+  {
+    title: 'Quiz',
+    url: '/quizzes'
+  },
+  {
+    title: 'FAQ',
+    url: '/faq'
   }
 ];
 

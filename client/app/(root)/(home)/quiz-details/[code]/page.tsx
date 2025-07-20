@@ -55,7 +55,7 @@ export default function QuizDetailsPage({ params }: { params: Promise<{ code: st
   }
 
   return (
-    <div className="mx-auto px-4 md:px-6 py-10 container">
+    <div className="mx-auto px-4 md:px-6 py-8 md:py-12 min-h-screen max-w-6xl container">
       <Link
         href="/dashboard/my-quizzes"
         className="inline-flex items-center mb-6 text-red-500 hover:underline"
