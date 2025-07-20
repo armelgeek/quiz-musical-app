@@ -3,8 +3,8 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/shared/providers/auth-provider";
-import { 
+import { useUserInfo } from '@/shared/hooks/use-user-info'
+import {
   Home,
   User,
   Settings,
@@ -12,10 +12,14 @@ import {
   HelpCircle,
   Bell,
   Menu,
-  X
+  X,
+  Award
 } from "lucide-react";
 import { Button } from "@/shared/components/atoms/ui/button";
 import { Logo } from "@/shared/components/atoms/ui/logo";
+import Image from 'next/image';
+import { useAuth } from "@/shared/providers/auth-provider";
+import { useRank } from "@/shared/providers/rank-provider";
 
 interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -23,21 +27,30 @@ interface NavigationItem {
   href: string;
 }
 
-  const navigationItems: NavigationItem[] = [
-    { icon: Home, label: "Accueil", href: "/dashboard" },
-    { icon: User, label: "Profil", href: "/dashboard/profile" },
-    { icon: Settings, label: "Paramètres", href: "/dashboard/settings" },
-  ];
+const navigationItems: NavigationItem[] = [
+  { icon: Home, label: "Accueil", href: "/dashboard" },
+  { icon: User, label: "Profil", href: "/dashboard/profile" },
+  { icon: Settings, label: "Paramètres", href: "/dashboard/settings" },
+];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { session, logout } = useAuth();
-  const user = session?.user;
+  const { logout } = useAuth();
+  const { user } = useUserInfo();
+  const { calculateNextLevelXP } = useRank();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
   };
+
+  function getInitials(name: string) {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,10 +68,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               >
                 <Menu className="w-5 h-5" />
               </Button>
-              
+
               <Link href="/" className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
-                   <Logo size="md" variant="compact" />
+                  <Logo size="md" variant="compact" />
                 </div>
                 <div className="hidden sm:flex flex-col">
                   <span className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">Mon espace</span>
@@ -75,13 +88,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 </div>
                 <div className="text-right">
                   <p className="font-medium text-gray-900">{user?.name || 'Utilisateur'}</p>
-                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  <p className="text-xs text-gray-500">{user?.email || ''}</p>
                 </div>
               </div>
-              
-              
-              <Button 
-                variant="outline" 
+
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleLogout}
                 className="flex items-center gap-1"
@@ -97,11 +110,35 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Mobile Sidebar Overlay */}
       {isMobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div 
-            className="fixed inset-0 bg-gray-600 bg-opacity-75" 
-            onClick={() => setIsMobileSidebarOpen(false)} 
+          <div
+            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            onClick={() => setIsMobileSidebarOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+            {/* Profile Section Mobile */}
+            <div className='bg-white shadow-sm p-6 border border-pink-100 rounded-xl mb-4'>
+              <div className='flex lg:flex-row flex-col items-center gap-4 pb-4'>
+                <div className='relative border-4 border-pink-100 rounded-full w-20 h-20 overflow-hidden'>
+                  {user?.image ? (
+                    <Image
+                      src={user?.image || "/images/placeholder.png"}
+                      alt={user?.name}
+                      fill
+                      className='object-cover'
+                    />
+                  ) : (
+                    <div className='flex justify-center items-center bg-pink-50 w-full h-full font-medium text-pink-500 text-xl'>
+                      {getInitials(user?.name || '')}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h2 className='font-bold text-xl'>{user?.name || ""}</h2>
+                  <p className='text-gray-500 text-sm'>{user?.rank || ""}</p>
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                 <Home className="w-4 h-4 text-primary" />
@@ -125,11 +162,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsMobileSidebarOpen(false)}
-                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        isActive
-                          ? "bg-primary text-white shadow-sm"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                        ? "bg-primary text-white shadow-sm"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        }`}
                     >
                       <div className={`${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}`}>
                         <item.icon className="h-5 w-5" />
@@ -143,17 +179,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             <div className="p-4 border-t border-gray-100">
               <div className="space-y-2">
-                <Button 
-                  className="w-full justify-start gap-2 h-9" 
+                <Button
+                  className="w-full justify-start gap-2 h-9"
                   variant="ghost"
                   size="sm"
                 >
                   <Bell className="w-4 h-4" />
                   Notifications
                 </Button>
-                
-                <Button 
-                  className="w-full justify-start gap-2 h-9" 
+
+                <Button
+                  className="w-full justify-start gap-2 h-9"
                   variant="ghost"
                   size="sm"
                 >
@@ -169,15 +205,66 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Layout Principal */}
       <div className="flex mt-4 sm:mt-6 lg:mt-10 px-4 sm:px-6 lg:px-8 xl:px-52">
         {/* Sidebar Desktop */}
-        <aside className="hidden lg:block w-64 bg-white rounded-lg shadow-sm border border-gray-100 h-fit">
-          <div className="p-4 border-b border-gray-100">
+        <aside className="hidden lg:block w-80  rounded-lg shadow-sm border border-gray-100 h-fit">
+          {/* Profile Section */}
+          <div className='p-6 border bg-white border-red-100 mb-4'>
+            <div className='flex lg:flex-row flex-col items-center gap-4'>
+              <div className='relative border-4 border-red-100 rounded-full w-20 h-20 overflow-hidden'>
+                {user?.image ? (
+                  <Image
+                    src={user.image || "/images/placeholder.png"}
+                    alt={user.name || ""}
+                    fill
+                    className='object-cover'
+                  />
+                ) : (
+                  <div className='flex justify-center items-center bg-red-50 w-full h-full font-medium text-red-500 text-xl'>
+                    {getInitials(user?.name || '')}
+                  </div>
+                )}
+              </div>
+              <div>
+                <h2 className='font-bold text-xl'>{user?.name}</h2>
+                <p className='text-gray-500 text-sm'>{user?.rank}</p>
+              </div>
+            </div>
+            <div className='space-y-4 mt-5'>
+              <div className='space-y-2'>
+                <div className='flex justify-between items-center'>
+                  <div className='flex items-center'>
+                    <Award className='mr-2 w-5 h-5 text-red-500' />
+                    <span className='font-medium'>Level {user?.level}</span>
+                  </div>
+                  <span className='text-gray-500 text-sm'>
+                    {user?.xp}/{calculateNextLevelXP(user?.xp ?? 0)} XP
+                  </span>
+                </div>
+                <div className='bg-red-100 rounded-full w-full h-2 overflow-hidden'>
+                  <div
+                    className='bg-red-500 rounded-full h-full'
+                    style={{
+                      width: `${user?.xp && calculateNextLevelXP(user?.xp) !== 0
+                          ? (user.xp /
+                            (calculateNextLevelXP(user.xp) + user.xp)) *
+                          100
+                          : 0
+                        }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div className="p-4 border border-red-100 bg-white">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
               <Home className="w-4 h-4 text-primary" />
               Navigation
             </div>
           </div>
 
-          <nav className="p-4">
+          <nav className="p-4 border-red-100 border">
             <div className="space-y-1">
               {navigationItems.map((item) => {
                 const isActive = pathname === item.href;
@@ -185,11 +272,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-primary text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                    }`}
+                    className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
                   >
                     <div className={`${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}`}>
                       <item.icon className="h-5 w-5" />
@@ -201,21 +287,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
           </nav>
 
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border  border-red-100">
             <div className="space-y-2">
-              <Button 
-                className="w-full justify-start gap-2 h-9" 
+              <Button
+                className="w-full justify-start gap-2 h-9"
                 variant="ghost"
-                size="sm"
               >
                 <Bell className="w-4 h-4" />
                 Notifications
               </Button>
-              
-              <Button 
-                className="w-full justify-start gap-2 h-9" 
+
+              <Button
+                className="w-full justify-start gap-2 h-9"
                 variant="ghost"
-                size="sm"
               >
                 <HelpCircle className="w-4 h-4" />
                 Aide & Support

@@ -21,12 +21,8 @@ export interface BaseService<T, TPayload> {
   remove(slug: string): Promise<ApiResponse>;
 }
 
-export abstract class BaseServiceImpl<T, TPayload> implements BaseService<T, TPayload> {
-  protected abstract endpoints: ResourceEndpoints;
 
-  protected abstract serializeParams(filter: Filter): string;
-
-  protected async fetchData<R>(url: string, options: RequestInit): Promise<R> {
+export async function fetchData<R>(url: string, options: RequestInit): Promise<R> {
     const response = await fetch(`${API_URL}${url}`, {
       ...options,
       credentials: 'include',
@@ -60,12 +56,18 @@ export abstract class BaseServiceImpl<T, TPayload> implements BaseService<T, TPa
     return JSON.parse(text) as R;
   }
 
+export abstract class BaseServiceImpl<T, TPayload> implements BaseService<T, TPayload> {
+  protected abstract endpoints: ResourceEndpoints;
+
+  protected abstract serializeParams(filter: Filter): string;
+  
+
   protected get<R>(endpoint: string): Promise<R> {
-    return this.fetchData<R>(endpoint, { method: 'GET' });
+    return fetchData<R>(endpoint, { method: 'GET' });
   }
 
   protected post<R>(endpoint: string, data: unknown): Promise<R> {
-    return this.fetchData<R>(endpoint, {
+    return fetchData<R>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -73,14 +75,14 @@ export abstract class BaseServiceImpl<T, TPayload> implements BaseService<T, TPa
 
 
   protected put<R>(endpoint: string, data: unknown): Promise<R> {
-    return this.fetchData<R>(endpoint, {
+    return fetchData<R>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
   protected delete<R>(endpoint: string): Promise<R> {
-    return this.fetchData<R>(endpoint, { method: 'DELETE' });
+    return fetchData<R>(endpoint, { method: 'DELETE' });
   }
 
   async list(filter: Filter): Promise<PaginatedResponse<T>> {

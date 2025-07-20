@@ -6,3 +6,4 @@ export * from './quiz.controller'
 export * from './leaderboard.controller'
 
 export * from './battle-royale.controller'
+export * from './user-rank.controller'

@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { AuthProvider } from './auth-provider';
+import { RankProvider } from './rank-provider';
 
 interface ProviderProps {
   readonly children: React.ReactNode;
@@ -19,7 +20,11 @@ export function Provider({ children }: ProviderProps) {
       <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-              <NuqsAdapter>{children}</NuqsAdapter>
+              <NuqsAdapter>
+                <RankProvider>
+                  {children}
+                </RankProvider>
+              </NuqsAdapter>
               <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </AuthProvider>

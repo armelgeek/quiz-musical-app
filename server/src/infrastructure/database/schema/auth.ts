@@ -10,10 +10,10 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').notNull(),
   image: text('image'),
   isAdmin: boolean('is_admin').notNull().default(false),
-  rank: text('rank').default('🥚 Brainy Beginnings'),
+  rank: text('rank').default('🥚 Nouvelle Note'),
   favouriteTopic: text('favourite_topic'),
-  level: text('level'),
-  xp: text('xp'),
+  level: text('level').default('1'),
+  xp: text('xp').default('0'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull()
 })

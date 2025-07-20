@@ -11,6 +11,9 @@ export const User = z.object({
   image: z.string().optional(),
   isAdmin: z.boolean(),
   xp: z.string().or(z.number()).default('0'),
+  rank: z.string().default('🥚 Brainy Beginnings'),
+  level: z.number().default(1),
+  favouriteTopic: z.string().optional(),
   badges: z.array(UserBadge).optional(),
   createdAt: z.string().or(z.date()),
   updatedAt: z.string().or(z.date())

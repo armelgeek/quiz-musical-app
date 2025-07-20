@@ -6,7 +6,8 @@ import {
   LeaderboardController,
   QuizController,
   QuizProgressController,
-  UserController
+  UserController,
+  UserRankController
 } from './infrastructure/controllers'
 
 import { attachBattleRoyaleSocket } from './infrastructure/ws/battle-royale.ws'
@@ -15,10 +16,12 @@ import { attachNotificationSocket } from './infrastructure/ws/notification.ws'
 
 const app = new App([
   new UserController(),
+  new UserRankController(),
   new QuizProgressController(),
   new QuizController(),
   new LeaderboardController(),
-  new BattleRoyaleController()
+  new BattleRoyaleController(),
+  new UserRankController()
 ]).getApp()
 
 const port = Number(process.env.PORT) || 3000

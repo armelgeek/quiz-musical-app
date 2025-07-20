@@ -1,12 +1,35 @@
 import { useMemo } from "react"
 import { authClient } from "@/shared/lib/config/auth-client"
-export function useUserInfo() {
-    const { data, isPending, error } = authClient.useSession()
-    const user = useMemo(() => data as unknown | null || null, [data]);
-    return {
-        user: user && typeof user === "object" && "user" in user ? (user as { user: unknown }).user : null,
-        isLoading: isPending,
-        error
-    }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  rank?: string;
+  level?: number;
+  xp?: number;
 }
+
+export interface UserInfoResult {
+  user: User | null;
+  isLoading: boolean;
+  error: unknown;
+}
+
+export function useUserInfo(): UserInfoResult {
+  const { data, isPending, error } = authClient.useSession();
+  const user = useMemo(() => {
+    if (data && typeof data === 'object' && 'user' in data) {
+      return data.user as User;
+    }
+    return null;
+  }, [data]);
+  return {
+    user,
+    isLoading: isPending,
+    error
+  };
+}
+
 export type UserInfo = ReturnType<typeof useUserInfo>;
