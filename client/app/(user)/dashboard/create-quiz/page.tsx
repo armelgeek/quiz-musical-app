@@ -32,6 +32,7 @@ interface QuizFormValues {
   duration: string;
   isPublic: boolean;
   questions: {
+    id: string;
     question: string;
     options: string[];
     answer: string;

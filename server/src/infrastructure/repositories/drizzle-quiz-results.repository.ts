@@ -1,5 +1,6 @@
 import { eq, sql } from 'drizzle-orm'
 import { db } from '../database/db'
+import { users } from '../database/schema'
 import { quizResults } from '../database/schema/quiz-results.schema'
 import type {
   QuizResult,
@@ -33,15 +34,37 @@ export class DrizzleQuizResultsRepository implements QuizResultsRepositoryInterf
     return inserted[0] as QuizResult
   }
 
-  async getQuizResultsByUser(userId: string): Promise<QuizResult[]> {
-    const rows = await db.select().from(quizResults).where(eq(quizResults.userId, userId))
-    return rows as QuizResult[]
+  async getQuizResultsByUser(userId: string, page = 1, limit = 10) {
+    const offset = (page - 1) * limit
+    const [rows, countResult] = await Promise.all([
+      db
+        .select()
+        .from(quizResults)
+        .where(eq(quizResults.userId, userId))
+        .orderBy(sql`${quizResults.completedAt} DESC`)
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql`COUNT(*)` })
+        .from(quizResults)
+        .where(eq(quizResults.userId, userId))
+    ])
+    const items = Array.isArray(rows) ? (rows as QuizResult[]) : []
+    const total = Number(countResult[0]?.count || 0)
+    const totalPages = Math.ceil(total / limit)
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages
+    }
   }
 
   async getLeaderboard(
     period: 'all' | 'day' | 'week' | 'month',
     limit?: number
-  ): Promise<{ userId: string; totalScore: number }[]> {
+  ): Promise<{ userId: string; totalScore: number; user: { name: string; image: string | null } }[]> {
     let whereSql = undefined
     if (period === 'day') {
       // Filter for today
@@ -55,24 +78,52 @@ export class DrizzleQuizResultsRepository implements QuizResultsRepositoryInterf
       whereSql = sql`strftime('%Y-%m', ${quizResults.completedAt}) = strftime('%Y-%m', CURRENT_DATE)`
     }
     const query = db
-      .select({ userId: quizResults.userId, totalScore: sql`SUM(score)` })
+      .select({
+        userId: quizResults.userId,
+        totalScore: sql`SUM(${quizResults.score})`,
+        name: users.name,
+        image: users.image
+      })
       .from(quizResults)
-      .groupBy(quizResults.userId)
+      .leftJoin(users, eq(quizResults.userId, users.id))
+      .groupBy(quizResults.userId, users.name, users.image)
       .orderBy(sql`totalScore DESC`)
     const rows = whereSql ? await query.where(whereSql) : await query
-    const arr = rows.map((r) => ({ userId: r.userId, totalScore: Number(r.totalScore) }))
+    const arr = rows.map((r) => ({
+      userId: r.userId,
+      totalScore: Number(r.totalScore),
+      user: {
+        name: r.name ?? '',
+        image: r.image ?? null
+      }
+    }))
     return limit ? arr.slice(0, limit) : arr
   }
 
-  async getPodiumOfDay(): Promise<{ userId: string; totalScore: number }[]> {
+  async getPodiumOfDay(): Promise<
+    { userId: string; totalScore: number; user: { name: string; image: string | null } }[]
+  > {
     const today = new Date().toISOString().slice(0, 10)
     const rows = await db
-      .select({ userId: quizResults.userId, totalScore: sql`SUM(score)` })
+      .select({
+        userId: quizResults.userId,
+        totalScore: sql`SUM(${quizResults.score})`,
+        name: users.name,
+        image: users.image
+      })
       .from(quizResults)
+      .leftJoin(users, eq(quizResults.userId, users.id))
       .where(sql`DATE(${quizResults.completedAt}) = ${today}`)
-      .groupBy(quizResults.userId)
+      .groupBy(quizResults.userId, users.name, users.image)
       .orderBy(sql`totalScore DESC`)
-    const arr = rows.map((r) => ({ userId: r.userId, totalScore: Number(r.totalScore) }))
+    const arr = rows.map((r) => ({
+      userId: r.userId,
+      totalScore: Number(r.totalScore),
+      user: {
+        name: r.name ?? '',
+        image: r.image ?? null
+      }
+    }))
     return arr.slice(0, 3)
   }
 }

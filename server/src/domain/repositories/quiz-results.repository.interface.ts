@@ -21,13 +21,17 @@ export interface QuizResultsRepositoryInterface {
     userId: string,
     result: Omit<QuizResult, 'userId' | 'updatedAt' | 'completedAt'>
   ) => Promise<QuizResult>
-  getQuizResultsByUser: (userId: string) => Promise<QuizResult[]>
+  getQuizResultsByUser: (
+    userId: string,
+    page?: number,
+    limit?: number
+  ) => Promise<{ items: QuizResult[]; total: number; page: number; limit: number; totalPages: number }>
 
   getQuizResultsByCode: (code: string) => Promise<QuizResult | null>
 
   getLeaderboard: (
     period: 'all' | 'day' | 'week' | 'month',
     limit?: number
-  ) => Promise<{ userId: string; totalScore: number }[]>
-  getPodiumOfDay: () => Promise<{ userId: string; totalScore: number }[]>
+  ) => Promise<{ userId: string; totalScore: number; user: { name: string; image: string | null } }[]>
+  getPodiumOfDay: () => Promise<{ userId: string; totalScore: number; user: { name: string; image: string | null } }[]>
 }

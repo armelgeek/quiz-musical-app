@@ -8,7 +8,7 @@ export class UserStatsRepository implements UserStatsRepositoryInterface {
 
   async getUserStats(userId: string): Promise<UserStats> {
     const quizResults = await this.quizResultsRepo.getQuizResultsByUser(userId)
-    const uniqueQuizIds = new Set(quizResults.map((q) => q.quizId))
+    const uniqueQuizIds = new Set(quizResults.items.map((q) => q.quizId))
     const quizzesCompleted = uniqueQuizIds.size
     return {
       userId,

@@ -1,8 +1,12 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
-import type { Routes } from '@/domain/types'
-import { GetQuizResultsByCodeUseCase, GetQuizResultsByUserUseCase, SaveQuizResultUseCase } from '../../application/use-cases/quiz-results/quiz-results.use-case'
-import { DrizzleQuizResultsRepository } from '../../infrastructure/repositories/drizzle-quiz-results.repository'
 import { GetQuizByCodeUseCase } from '@/application/use-cases/quiz'
+import type { Routes } from '@/domain/types'
+import {
+  GetQuizResultsByCodeUseCase,
+  GetQuizResultsByUserUseCase,
+  SaveQuizResultUseCase
+} from '../../application/use-cases/quiz-results/quiz-results.use-case'
+import { DrizzleQuizResultsRepository } from '../../infrastructure/repositories/drizzle-quiz-results.repository'
 
 const quizResultSchema = z
   .object({
@@ -24,12 +28,6 @@ const quizResultSchema = z
 const quizResultResponseSchema = z.object({
   success: z.boolean(),
   data: quizResultSchema.optional(),
-  error: z.any().optional()
-})
-
-const quizResultsListResponseSchema = z.object({
-  success: z.boolean(),
-  data: z.array(quizResultSchema).optional(),
   error: z.any().optional()
 })
 
@@ -155,13 +153,28 @@ export class QuizResultsController implements Routes {
         method: 'get',
         path: '/v1/quiz-results',
         tags: ['QuizResults'],
-        summary: 'Récupérer les résultats de quiz pour un utilisateur',
+        summary: 'Récupérer les résultats de quiz pour un utilisateur (paginé)',
+        request: {
+          query: z.object({
+            page: z.string().optional(),
+            limit: z.string().optional()
+          })
+        },
         responses: {
           200: {
-            description: 'Liste des résultats de quiz',
+            description: 'Liste paginée des résultats de quiz',
             content: {
               'application/json': {
-                schema: quizResultsListResponseSchema
+                schema: z.object({
+                  success: z.boolean(),
+                  data: z.object({
+                    items: z.array(quizResultSchema),
+                    total: z.number(),
+                    page: z.number(),
+                    limit: z.number(),
+                    totalPages: z.number()
+                  })
+                })
               }
             }
           }
@@ -173,8 +186,19 @@ export class QuizResultsController implements Routes {
           if (!user || !user.id) {
             return c.json({ success: false, error: 'User not authenticated' }, 401)
           }
-          const results = await this.getQuizResultsByUser.execute(user.id)
-          return c.json({ success: true, data: results })
+          const { page = '1', limit = '10' } = c.req.query()
+          const pageNum = Number.parseInt(page, 10) || 1
+          const limitNum = Number.parseInt(limit, 10) || 10
+          const results = await this.getQuizResultsByUser.execute(user.id, pageNum, limitNum)
+          // Defensive: always return a paginated object with items array
+          const paginated = {
+            items: Array.isArray(results?.items) ? results.items : [],
+            total: typeof results?.total === 'number' ? results.total : 0,
+            page: typeof results?.page === 'number' ? results.page : pageNum,
+            limit: typeof results?.limit === 'number' ? results.limit : limitNum,
+            totalPages: typeof results?.totalPages === 'number' ? results.totalPages : 1
+          }
+          return c.json({ success: true, data: paginated })
         } catch (error: any) {
           return c.json({ success: false, error: error.message }, 400)
         }

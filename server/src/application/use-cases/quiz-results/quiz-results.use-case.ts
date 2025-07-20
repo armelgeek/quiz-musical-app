@@ -14,8 +14,8 @@ export class SaveQuizResultUseCase {
 export class GetQuizResultsByUserUseCase {
   constructor(private repo: QuizResultsRepositoryInterface) {}
 
-  execute(userId: string): Promise<QuizResult[]> {
-    return this.repo.getQuizResultsByUser(userId)
+  execute(userId: string, page?: number, limit?: number) {
+    return this.repo.getQuizResultsByUser(userId, page, limit)
   }
 }
 export class GetQuizResultsByCodeUseCase {

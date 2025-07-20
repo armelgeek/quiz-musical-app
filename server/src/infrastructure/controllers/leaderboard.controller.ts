@@ -4,7 +4,11 @@ import { QuizResultsRepository } from '../repositories/quiz-results.repository'
 
 const LeaderboardEntrySchema = z.object({
   userId: z.string(),
-  totalScore: z.number()
+  totalScore: z.number(),
+  user: z.object({
+    name: z.string(),
+    image: z.string().nullable()
+  })
 })
 
 export class LeaderboardController {
