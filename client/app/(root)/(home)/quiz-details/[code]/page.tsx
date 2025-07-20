@@ -90,7 +90,7 @@ export default function QuizDetailsPage({ params }: { params: Promise<{ code: st
 
           <div className="flex gap-2">
             <Link
-              href={`/dashboard/quiz-session/${quiz.code}`}
+              href={`/quiz-session/${quiz.code}`}
               className="inline-flex flex-1 justify-center items-center bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
             >
               Commencer <ChevronRight className="ml-1 w-4 h-4" />

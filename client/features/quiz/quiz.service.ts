@@ -3,6 +3,7 @@
 import { BaseServiceImpl } from '@/shared/domain/base.service';
 
 export interface Question {
+  id: string;
   question: string;
   options: string[];
   answer: string;

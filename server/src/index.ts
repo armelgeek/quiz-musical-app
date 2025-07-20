@@ -10,6 +10,8 @@ import {
   UserRankController
 } from './infrastructure/controllers'
 
+import { QuizResultsController } from './infrastructure/controllers/quiz-results.controller'
+
 import { attachBattleRoyaleSocket } from './infrastructure/ws/battle-royale.ws'
 import { attachMultiplayerSocket } from './infrastructure/ws/multiplayer.ws'
 import { attachNotificationSocket } from './infrastructure/ws/notification.ws'
@@ -21,7 +23,8 @@ const app = new App([
   new QuizController(),
   new LeaderboardController(),
   new BattleRoyaleController(),
-  new UserRankController()
+  new UserRankController(),
+  new QuizResultsController(),
 ]).getApp()
 
 const port = Number(process.env.PORT) || 3000

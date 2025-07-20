@@ -15,6 +15,13 @@
       "when": 1752964305205,
       "tag": "0001_nasty_big_bertha",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753026107413,
+      "tag": "0002_nervous_jimmy_woo",
+      "breakpoints": true
     }
   ]
 }
