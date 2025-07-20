@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BookOpen, Award, Brain, ChevronRight } from "lucide-react";
-import FeaturedQuizzes from "@/app/components/featured-quizzes";
+import { PodiumCard, LeaderboardCard } from "./leaderboard/page";
 
 export default function Home() {
   return (
@@ -89,23 +89,27 @@ export default function Home() {
           </div>
         </section>
 
-        <section className='bg-rose-50 py-12 md:py-24 lg:py-32 w-full'>
-          <div className='mx-auto px-4 md:px-6 max-w-6xl container'>
-            <div className='flex flex-col justify-center items-center space-y-4 text-center'>
-              <div className='space-y-2'>
-                <div className='inline-block bg-rose-100 px-3 py-1 rounded-full font-medium text-rose-600 text-sm shadow-sm'>
-                  Quiz à la une
-                </div>
-                <h2 className='font-extrabold text-3xl md:text-4xl tracking-tighter text-gray-900'>
-                  Les plus populaires du moment
-                </h2>
-                <p className='max-w-[700px] text-gray-500 md:text-xl'>
-                  Découvre les quiz tendances de notre collection.
-                </p>
+        {/* Classement du moment */}
+        <section className="bg-rose-50 py-12 md:py-20 w-full">
+          <div className="mx-auto px-4 md:px-6 max-w-6xl container">
+            <div className="flex flex-col justify-center items-center space-y-4 text-center mb-8">
+              <div className="inline-block bg-rose-100 px-3 py-1 rounded-full font-medium text-rose-600 text-sm shadow-sm">
+                Classement du moment
               </div>
+              <h2 className="font-extrabold text-3xl md:text-4xl tracking-tighter text-gray-900">
+                Podium &amp; Leaderboard
+              </h2>
+              <p className="max-w-[700px] text-gray-500 md:text-xl">
+                Découvre les meilleurs joueurs du moment et tente de grimper dans le classement !
+              </p>
             </div>
-            <div className='mx-auto mt-8'>
-              <FeaturedQuizzes />
+            <div className="flex flex-col md:flex-row gap-8 items-stretch justify-center w-full max-w-4xl mx-auto">
+              <div className="flex-1 flex items-center justify-center">
+                <PodiumCard />
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <LeaderboardCard />
+              </div>
             </div>
           </div>
         </section>
