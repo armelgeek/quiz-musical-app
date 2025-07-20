@@ -12,19 +12,72 @@ import {
   Award,
   Lock,
   Globe,
+  Trash2,
+  Share2,
 } from "lucide-react";
 import { useMyQuizzes } from '@/features/quiz/hooks/use-my-quizzes';
+import { useDeleteQuiz, useToggleQuizVisibility } from '@/features/quiz/hooks/use-quiz-crud';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shared/components/atoms/ui/alert-dialog';
 
 
 
 export default function MyQuizzesPage() {
   const [copiedCode, setCopiedCode] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [quizToDelete, setQuizToDelete] = useState<number | null>(null);
   const { data: quizzes = [], isLoading, isError } = useMyQuizzes();
+  const deleteQuizMutation = useDeleteQuiz();
+  const toggleVisibilityMutation = useToggleQuizVisibility();
 
   const copyCodeToClipboard = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(""), 2000);
+  };
+
+  const handleShare = (quiz: { code: string; title: string }) => {
+    const shareUrl = `${window.location.origin}/dashboard/quiz-details/${quiz.code}`;
+    if (navigator.share) {
+      navigator.share({
+        title: quiz.title,
+        text: `Essayez mon quiz : ${quiz.title}`,
+        url: shareUrl,
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      setCopiedCode(`share-${quiz.code}`);
+      setTimeout(() => setCopiedCode(""), 2000);
+    }
+  };
+
+  const handleToggleVisibility = (quiz: { id: number; isPublic: boolean }) => {
+    toggleVisibilityMutation.mutate({ id: quiz.id, isPublic: !quiz.isPublic });
+  };
+
+  const handleDelete = (id: number) => {
+    setQuizToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (quizToDelete != null) {
+      deleteQuizMutation.mutate(quizToDelete, {
+        onSettled: () => {
+          setDeleteDialogOpen(false);
+          setQuizToDelete(null);
+        },
+      });
+    }
   };
 
   // Format date
@@ -139,17 +192,70 @@ export default function MyQuizzesPage() {
 
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    href={`/quiz-details/${quiz.code}`}
+                    href={`/dashboard/quiz-details/${quiz.code}`}
                     className="inline-flex justify-center items-center bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
                   >
                     <Eye className="mr-1 w-4 h-4" /> Voir le quiz
                   </Link>
                   <Link
-                    href={`/edit-quiz/${quiz.id}`}
+                    href={`/dashboard/edit-quiz/${quiz.id}`}
                     className="inline-flex justify-center items-center bg-white hover:bg-gray-50 px-4 py-2 border border-gray-200 rounded-full font-medium text-gray-700 transition-colors"
                   >
                     <Edit className="mr-1 w-4 h-4" /> Modifier
                   </Link>
+                  <button
+                    onClick={() => handleToggleVisibility(quiz)}
+                    className="inline-flex justify-center items-center bg-white hover:bg-gray-50 px-4 py-2 border border-gray-200 rounded-full font-medium text-gray-700 transition-colors"
+                    disabled={toggleVisibilityMutation.isPending}
+                  >
+                    {quiz.isPublic ? (
+                      <>
+                        <Lock className="mr-1 w-4 h-4" /> Rendre privé
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="mr-1 w-4 h-4" /> Rendre public
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleShare(quiz)}
+                    className="inline-flex justify-center items-center bg-white hover:bg-red-50 px-4 py-2 border border-red-200 rounded-full font-medium text-red-500 transition-colors"
+                  >
+                    {copiedCode === `share-${quiz.code}` ? (
+                      <span className="text-green-500 text-xs">Lien copié !</span>
+                    ) : (
+                      <>
+                        <Share2 className="mr-1 w-4 h-4" /> Partager
+                      </>
+                    )}
+                  </button>
+                  <AlertDialog open={deleteDialogOpen && quizToDelete === quiz.id}>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        onClick={() => handleDelete(quiz.id)}
+                        className="inline-flex justify-center items-center bg-white hover:bg-red-50 px-4 py-2 border border-red-200 rounded-full font-medium text-red-500 transition-colors"
+                      >
+                        <Trash2 className="mr-1 w-4 h-4" /> Supprimer
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Supprimer le quiz</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Êtes-vous sûr de vouloir supprimer ce quiz ? Cette action est irréversible.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+                          Annuler
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} disabled={deleteQuizMutation.isPending}>
+                          {deleteQuizMutation.isPending ? 'Suppression...' : 'Supprimer'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>

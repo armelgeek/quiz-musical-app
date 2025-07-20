@@ -17,7 +17,11 @@ export interface Quiz {
   topic: string;
   duration: string;
   code: string;
-  createdBy: number;
+  createdBy: {
+    id: string;
+    name: string;
+    email: string;
+  };
   isPublic: boolean;
   questions: Question[];
   createdAt: string;
@@ -42,6 +46,13 @@ export class QuizService extends BaseServiceImpl<Quiz, Partial<Quiz>> {
     return this.get<{ success: boolean; quizzes: Quiz[] }>(`/quizzes/user`).then(res => res.quizzes);
   }
 
+  async getQuizById(id: string): Promise<Quiz> {
+    return this.get<{ success: boolean; quiz: Quiz }>(`/quizzes/${id}`).then(res => res.quiz);
+  }
+
+  async getQuizByCode(code: string): Promise<Quiz | null> {
+    return this.get<{ success: boolean; quiz: Quiz }>(`/quizzes/code/${code}`).then(res => res.quiz || null);
+  }
   async deleteQuiz(id: number): Promise<void> {
     await this.delete<void>(`/api/quizzes/${id}`);
   }

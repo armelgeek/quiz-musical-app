@@ -59,8 +59,8 @@ export default function SortableQuestion({
         transform ? "opacity-75 scale-105 z-10" : "opacity-100"
       }`}
     >
-      <div className="bg-white shadow-sm border border-pink-100 rounded-xl overflow-hidden">
-        <div className="p-4 border-pink-100 border-b">
+      <div className="bg-white shadow-sm border border-red-100 rounded-xl overflow-hidden">
+        <div className="p-4 border-red-100 border-b">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div
@@ -85,7 +85,7 @@ export default function SortableQuestion({
                     <X className="w-4 h-4" />
                   </button>
                   <button
-                    className="p-1 text-pink-500 hover:text-pink-700 transition-colors"
+                    className="p-1 text-red-500 hover:text-red-700 transition-colors"
                     onClick={handleSave}
                   >
                     <Save className="w-4 h-4" />
@@ -110,13 +110,13 @@ export default function SortableQuestion({
         </div>
         <div>
           <div
-            className="hover:bg-pink-50 p-4 transition-colors cursor-pointer"
+            className="hover:bg-red-50 p-4 transition-colors cursor-pointer"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             {isEditing ? "Edit Question" : field.question || "Nouvelle question"}
           </div>
           {(isExpanded || isEditing) && (
-            <div className="p-4 border-pink-100 border-t">
+            <div className="p-4 border-red-100 border-t">
               {isEditing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -124,7 +124,7 @@ export default function SortableQuestion({
                       Question
                     </label>
                     <textarea
-                      className="p-2 border border-gray-300 focus:border-pink-500 rounded-lg focus:outline-none focus:ring-pink-500 w-full"
+                      className="p-2 border border-gray-300 focus:border-red-500 rounded-lg focus:outline-none focus:ring-red-500 w-full"
                       value={editedQuestion.question}
                       onChange={e => setEditedQuestion({ ...editedQuestion, question: e.target.value })}
                       placeholder="Entrez la question"
@@ -139,13 +139,13 @@ export default function SortableQuestion({
                       <div key={optionIdx} className="flex items-center gap-2">
                         <input
                           type="text"
-                          className="flex-1 p-2 border border-gray-300 focus:border-pink-500 rounded-lg focus:outline-none focus:ring-pink-500"
+                          className="flex-1 p-2 border border-gray-300 focus:border-red-500 rounded-lg focus:outline-none focus:ring-red-500"
                           value={option}
                           onChange={e => handleOptionChange(optionIdx, e.target.value)}
                           placeholder={`Option ${optionIdx + 1}`}
                         />
                         <div
-                          className={`h-5 w-5 rounded-full border ${editedQuestion.answer === option ? "bg-pink-500 border-pink-500" : "border-gray-300"} flex items-center justify-center cursor-pointer`}
+                          className={`h-5 w-5 rounded-full border ${editedQuestion.answer === option ? "bg-red-500 border-red-500" : "border-gray-300"} flex items-center justify-center cursor-pointer`}
                           onClick={() => setEditedQuestion({ ...editedQuestion, answer: option })}
                         >
                           {editedQuestion.answer === option && <Check className="w-3 h-3 text-white" />}
@@ -158,7 +158,7 @@ export default function SortableQuestion({
                       Points
                     </label>
                     <select
-                      className="p-2 border border-gray-300 focus:border-pink-500 rounded-lg focus:outline-none focus:ring-pink-500"
+                      className="p-2 border border-gray-300 focus:border-red-500 rounded-lg focus:outline-none focus:ring-red-500"
                       value={editedQuestion.points}
                       onChange={e => setEditedQuestion({ ...editedQuestion, points: Number.parseInt(e.target.value) })}
                     >
@@ -176,7 +176,7 @@ export default function SortableQuestion({
                     {field.options.map((option: string, optionIdx: number) => (
                       <div key={optionIdx} className="flex items-center space-x-2">
                         <div
-                          className={`h-5 w-5 rounded-full border ${option === field.answer ? "bg-pink-500 border-pink-500" : "border-gray-300"} flex items-center justify-center`}
+                          className={`h-5 w-5 rounded-full border ${option === field.answer ? "bg-red-500 border-red-500" : "border-gray-300"} flex items-center justify-center`}
                         >
                           {option === field.answer && <Check className="w-3 h-3 text-white" />}
                         </div>

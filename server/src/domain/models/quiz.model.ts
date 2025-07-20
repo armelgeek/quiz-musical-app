@@ -1,3 +1,6 @@
+
+import type { UserType } from './user.model'
+
 // Quiz domain model
 type QuizQuestion = {
   question: string
@@ -16,7 +19,7 @@ export interface Quiz {
   topic: string
   duration: string
   code: string
-  createdBy: string
+  createdBy: string | UserType
   isPublic: boolean
   questions: QuizQuestion[]
   createdAt: string

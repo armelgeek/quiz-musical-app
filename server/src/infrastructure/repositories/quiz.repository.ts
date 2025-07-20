@@ -3,12 +3,14 @@ import { and, desc, eq, inArray } from 'drizzle-orm'
 import { createClient } from 'redis'
 import type { QuizRepositoryInterface } from '@/domain/repositories/quiz.repository.interface'
 import { db } from '../database/db'
+import { users } from '../database/schema/auth'
 import { quizzes } from '../database/schema/quiz'
 
 import type { Quiz, QuizQuestion } from '../../domain/models/quiz.model'
 import { generateUniqueQuizCode } from './quiz-code.util'
 
 export class QuizRepository implements QuizRepositoryInterface {
+ 
   private readonly REDIS_KEY = 'public_quiz_ids'
   private readonly CACHE_TTL = 5 * 60 // 5 min
   private redis
@@ -16,6 +18,10 @@ export class QuizRepository implements QuizRepositoryInterface {
   constructor() {
     this.redis = createClient({ url: process.env.REDIS_URL })
     this.redis.connect().catch(() => {})
+  }
+  async findByUser(userId: string): Promise<Quiz[]> {
+    const result = await db.select().from(quizzes).where(eq(quizzes.createdBy, userId)).orderBy(desc(quizzes.createdAt))
+    return result.map(this.mapDbQuiz)
   }
 
   mapDbQuiz(row: any): Quiz {
@@ -53,16 +59,89 @@ export class QuizRepository implements QuizRepositoryInterface {
     return result[0] ? this.mapDbQuiz(result[0]) : null
   }
 
-  async findByUser(userId: string) {
-    const result = await db.select().from(quizzes).where(eq(quizzes.createdBy, userId)).orderBy(desc(quizzes.createdAt))
-    return result.map(this.mapDbQuiz)
+  async findByCode(code: string) {
+    const result = await db
+      .select({
+        id: quizzes.id,
+        title: quizzes.title,
+        instruction: quizzes.instruction,
+        passingScore: quizzes.passingScore,
+        maxScore: quizzes.maxScore,
+        xpReward: quizzes.xpReward,
+        subject: quizzes.subject,
+        topic: quizzes.topic,
+        duration: quizzes.duration,
+        code: quizzes.code,
+        isPublic: quizzes.isPublic,
+        questions: quizzes.questions,
+        createdAt: quizzes.createdAt,
+        updatedAt: quizzes.updatedAt,
+        createdBy: quizzes.createdBy,
+        user_id: users.id,
+        user_name: users.name,
+        user_firstname: users.firstname,
+        user_lastname: users.lastname,
+        user_email: users.email,
+        user_emailVerified: users.emailVerified,
+        user_image: users.image,
+        user_isAdmin: users.isAdmin,
+        user_xp: users.xp,
+        user_rank: users.rank,
+        user_level: users.level,
+        user_favouriteTopic: users.favouriteTopic,
+        user_createdAt: users.createdAt,
+        user_updatedAt: users.updatedAt
+      })
+      .from(quizzes)
+      .leftJoin(users, eq(quizzes.createdBy, users.id))
+      .where(eq(quizzes.code, code))
+
+    if (!result || result.length === 0) return null
+    const row = result[0]
+    const createdBy = row.user_id
+      ? {
+          id: row.user_id,
+          name: row.user_name ?? '',
+          firstname: row.user_firstname ?? '',
+          lastname: row.user_lastname ?? '',
+          email: row.user_email ?? '',
+          emailVerified: row.user_emailVerified ?? false,
+          image: row.user_image ?? '',
+          isAdmin: row.user_isAdmin ?? false,
+          xp: Number(row.user_xp ?? 0),
+          rank: row.user_rank ?? '',
+          level: Number(row.user_level ?? 0),
+          favouriteTopic: row.user_favouriteTopic ?? '',
+          createdAt: row.user_createdAt ?? new Date(),
+          updatedAt: row.user_updatedAt ?? new Date()
+        }
+      : row.createdBy
+    return {
+      id: row.id,
+      title: row.title,
+      instruction: row.instruction,
+      passingScore: row.passingScore,
+      maxScore: row.maxScore,
+      xpReward: row.xpReward,
+      subject: row.subject,
+      topic: row.topic,
+      duration: row.duration,
+      code: row.code,
+      isPublic: row.isPublic ?? true,
+      questions: Array.isArray(row.questions) ? row.questions : [],
+      createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : '',
+      updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : '',
+      createdBy
+    }
   }
 
   async create(quiz: Omit<Quiz, 'id' | 'createdAt' | 'updatedAt'>) {
     const code = await generateUniqueQuizCode()
+    // createdBy doit être string (id) pour l'insert
+    const { createdBy, ...rest } = quiz
     const [created] = await db
       .insert(quizzes)
-      .values({ ...quiz, code })
+      .values({ ...rest, createdBy: typeof createdBy === 'string' ? createdBy : createdBy.id, code })
       .returning()
     return this.mapDbQuiz(created)
   }

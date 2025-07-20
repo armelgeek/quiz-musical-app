@@ -11,6 +11,7 @@ import {
   DeleteQuizUseCase,
   GetAllQuizzesUseCase,
   GetAllQuizzesWithSecretUseCase,
+  GetQuizByCodeUseCase,
   GetQuizByIdUseCase,
   GetQuizzesByUserUseCase,
   UpdateQuizIsPublicUseCase,
@@ -21,6 +22,7 @@ import { GameSessionRepository } from '../repositories/game-session.repository'
 import { QuizRepository } from '../repositories/quiz.repository'
 import { UserRepository } from '../repositories/user.repository'
 import type { Routes } from '../../domain/types/route.type'
+
 
 const GameSessionSchema = z.object({
   id: z.number(),
@@ -75,6 +77,7 @@ export class QuizController implements Routes {
   private getAllQuizzes = new GetAllQuizzesUseCase(this.quizRepo)
   private getAllQuizzesWithSecret = new GetAllQuizzesWithSecretUseCase(this.quizRepo)
   private getQuizById = new GetQuizByIdUseCase(this.quizRepo)
+  private getQuizByCode = new GetQuizByCodeUseCase(this.quizRepo)
   private getQuizzesByUser = new GetQuizzesByUserUseCase(this.quizRepo)
   private createQuiz = new CreateQuizUseCase(this.quizRepo)
   private updateQuiz = new UpdateQuizUseCase(this.quizRepo)
@@ -106,6 +109,35 @@ export class QuizController implements Routes {
   })
 
   public initRoutes() {
+    // GET /quizzes/code/:code
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/quizzes/code/:code',
+        tags: ['Quiz'],
+        summary: 'Get quiz by code',
+        request: { params: z.object({ code: z.string() }) },
+        responses: {
+          200: {
+            description: 'Quiz by code',
+            content: {
+              'application/json': {
+                schema: z.object({
+                  success: z.boolean(),
+                  quiz: this.QuizSchema.optional(),
+                  error: z.string().optional()
+                })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const code = c.req.param('code')
+        const result = await this.getQuizByCode.execute(code)
+        return c.json(result)
+      }
+    )
     // GET /game-sessions/:id
     this.controller.openapi(
       createRoute({
@@ -333,7 +365,6 @@ export class QuizController implements Routes {
       }
     )
 
-
     this.controller.openapi(
       createRoute({
         method: 'get',
@@ -388,7 +419,6 @@ export class QuizController implements Routes {
         return c.json(result)
       }
     )
-
 
     // POST /quizzes
     this.controller.openapi(

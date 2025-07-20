@@ -76,7 +76,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 <div className="flex items-center justify-center">
                   <Logo size="md" variant="compact" />
                 </div>
-                <div className="hidden sm:flex flex-col">
+                <div className="hidden sm:flex ml-3 flex-col">
                   <span className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">Mon espace</span>
                   <span className="text-xs text-gray-500 font-medium">Personnel</span>
                 </div>
@@ -119,9 +119,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           />
           <aside className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
             {/* Profile Section Mobile */}
-            <div className='bg-white shadow-sm p-6 border border-pink-100 rounded-xl mb-4'>
+            <div className='bg-white shadow-sm p-6 border border-red-100 rounded-xl mb-4'>
               <div className='flex lg:flex-row flex-col items-center gap-4 pb-4'>
-                <div className='relative border-4 border-pink-100 rounded-full w-20 h-20 overflow-hidden'>
+                <div className='relative border-4 border-red-100 rounded-full w-20 h-20 overflow-hidden'>
                   {user?.image ? (
                     <Image
                       src={user?.image || "/images/placeholder.png"}
@@ -130,7 +130,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       className='object-cover'
                     />
                   ) : (
-                    <div className='flex justify-center items-center bg-pink-50 w-full h-full font-medium text-pink-500 text-xl'>
+                    <div className='flex justify-center items-center bg-red-50 w-full h-full font-medium text-red-500 text-xl'>
                       {getInitials(user?.name || '')}
                     </div>
                   )}

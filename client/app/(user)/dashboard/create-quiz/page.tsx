@@ -21,7 +21,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import SortableQuestion from "../sortable-question";
+import SortableQuestion from "../components/sortable-question";
+import { useRouter } from "next/router";
 interface QuizFormValues {
   title: string;
   instruction: string;
@@ -40,6 +41,7 @@ interface QuizFormValues {
 
 export default function CreateQuizPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'basic' | 'questions'>('basic');
 
   const { control, register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<QuizFormValues>({
@@ -114,6 +116,7 @@ export default function CreateQuizPage() {
       return;
     }
     createQuizMutation.mutate(data);
+    router.push("/dashboard/my-quizzes");
   };
 
   return (
