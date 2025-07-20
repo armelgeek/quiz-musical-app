@@ -13,7 +13,9 @@ import {
   Bell,
   Menu,
   X,
-  Award
+  Award,
+  BookOpen,
+  Trophy
 } from "lucide-react";
 import { Button } from "@/shared/components/atoms/ui/button";
 import { Logo } from "@/shared/components/atoms/ui/logo";
@@ -30,6 +32,7 @@ interface NavigationItem {
 const navigationItems: NavigationItem[] = [
   { icon: Home, label: "Accueil", href: "/dashboard" },
   { icon: User, label: "Profil", href: "/dashboard/profile" },
+  { icon: BookOpen, label: "Mes Quiz", href: "/dashboard/my-quizzes" },
   { icon: Settings, label: "Paramètres", href: "/dashboard/settings" },
 ];
 
@@ -244,14 +247,31 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     className='bg-red-500 rounded-full h-full'
                     style={{
                       width: `${user?.xp && calculateNextLevelXP(user?.xp) !== 0
-                          ? (user.xp /
-                            (calculateNextLevelXP(user.xp) + user.xp)) *
-                          100
-                          : 0
+                        ? (user.xp /
+                          (calculateNextLevelXP(user.xp) + user.xp)) *
+                        100
+                        : 0
                         }%`,
                     }}
                   ></div>
                 </div>
+              </div>
+            </div>
+
+            <div className='gap-4 grid grid-cols-2 pt-4'>
+              <div className='flex flex-col justify-center items-center bg-red-50 p-4 rounded-lg'>
+                <BookOpen className='mb-2 w-6 h-6 text-red-500' />
+                <span className='font-bold text-xl'>
+                  0
+                </span>
+                <span className='text-gray-500 text-xs'>
+                 Completed
+                </span>
+              </div>
+              <div className='flex flex-col justify-center items-center bg-red-50 p-4 rounded-lg'>
+                <Trophy className='mb-2 w-6 h-6 text-red-500' />
+                <span className='font-bold text-xl'>0</span>
+                <span className='text-gray-500 text-xs'>Achievements</span>
               </div>
             </div>
           </div>
@@ -286,31 +306,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               })}
             </div>
           </nav>
-
-          <div className="p-4 border  border-red-100">
-            <div className="space-y-2">
-              <Button
-                className="w-full justify-start gap-2 h-9"
-                variant="ghost"
-              >
-                <Bell className="w-4 h-4" />
-                Notifications
-              </Button>
-
-              <Button
-                className="w-full justify-start gap-2 h-9"
-                variant="ghost"
-              >
-                <HelpCircle className="w-4 h-4" />
-                Aide & Support
-              </Button>
-            </div>
-          </div>
         </aside>
 
-        {/* Contenu principal */}
         <main className="flex-1 lg:ml-6">
-          <div className="lg:px-6 py-4 sm:py-6 lg:py-8">
+          <div className="lg:px-3 py-2 sm:py-3 lg:py-4">
             {children}
           </div>
         </main>

@@ -333,6 +333,32 @@ export class QuizController implements Routes {
       }
     )
 
+
+    this.controller.openapi(
+      createRoute({
+        method: 'get',
+        path: '/quizzes/user',
+        tags: ['Quiz'],
+        summary: 'Get quizzes by current user',
+        responses: {
+          200: {
+            description: 'User quizzes',
+            content: {
+              'application/json': {
+                schema: z.object({ success: z.boolean(), quizzes: z.array(this.QuizSchema) })
+              }
+            }
+          }
+        }
+      }),
+      async (c: any) => {
+        const user = c.get('user')
+        if (!user) return c.json({ success: false, error: 'Unauthorized' }, 401)
+        const result = await this.getQuizzesByUser.execute(user.id)
+        return c.json(result)
+      }
+    )
+
     // GET /quizzes/:id
     this.controller.openapi(
       createRoute({
@@ -363,31 +389,6 @@ export class QuizController implements Routes {
       }
     )
 
-    // GET /quizzes/user (user's quizzes)
-    this.controller.openapi(
-      createRoute({
-        method: 'get',
-        path: '/quizzes/user',
-        tags: ['Quiz'],
-        summary: 'Get quizzes by current user',
-        responses: {
-          200: {
-            description: 'User quizzes',
-            content: {
-              'application/json': {
-                schema: z.object({ success: z.boolean(), quizzes: z.array(this.QuizSchema) })
-              }
-            }
-          }
-        }
-      }),
-      async (c: any) => {
-        const user = c.get('user')
-        if (!user) return c.json({ success: false, error: 'Unauthorized' }, 401)
-        const result = await this.getQuizzesByUser.execute(user.id)
-        return c.json(result)
-      }
-    )
 
     // POST /quizzes
     this.controller.openapi(
