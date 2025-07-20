@@ -6,6 +6,7 @@ import { db } from '../database/db'
 import { quizzes } from '../database/schema/quiz'
 
 import type { Quiz, QuizQuestion } from '../../domain/models/quiz.model'
+import { generateUniqueQuizCode } from './quiz-code.util'
 
 export class QuizRepository implements QuizRepositoryInterface {
   private readonly REDIS_KEY = 'public_quiz_ids'
@@ -58,12 +59,15 @@ export class QuizRepository implements QuizRepositoryInterface {
   }
 
   async create(quiz: Omit<Quiz, 'id' | 'createdAt' | 'updatedAt'>) {
-    const [created] = await db.insert(quizzes).values(quiz).returning()
+    const code = await generateUniqueQuizCode()
+    const [created] = await db
+      .insert(quizzes)
+      .values({ ...quiz, code })
+      .returning()
     return this.mapDbQuiz(created)
   }
 
   async update(quizId: number, userId: string, update: Partial<Quiz>) {
-    // Only allow updatable fields
     const allowed: any = { ...update }
     delete allowed.id
     delete allowed.createdAt
@@ -111,12 +115,10 @@ export class QuizRepository implements QuizRepositoryInterface {
         ids = Array.from(idsSet)
       }
       if (ids.length === 0) return []
-      // Redis retourne des strings, il faut caster en number
       const idNums = ids.map(Number)
       const result = await db.select().from(quizzes).where(inArray(quizzes.id, idNums))
       return this.shuffleArray(result).map(this.mapDbQuiz)
     } catch {
-      // Fallback SQL si Redis indisponible
       const publicQuizIds = await db.select({ id: quizzes.id }).from(quizzes).where(eq(quizzes.isPublic, true))
       if (publicQuizIds.length === 0) return []
       const randomIds = this.shuffleArray(publicQuizIds)

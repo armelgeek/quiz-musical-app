@@ -97,7 +97,7 @@ export class QuizController implements Routes {
     subject: z.string(),
     topic: z.string(),
     duration: z.string(),
-    code: z.string(),
+    code: z.string().optional(),
     createdBy: z.number(),
     isPublic: z.boolean(),
     questions: z.array(this.QuizQuestionSchema),

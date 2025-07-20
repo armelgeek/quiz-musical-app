@@ -47,8 +47,8 @@ export default function MyQuizzesPage() {
           </p>
         </div>
         <Link
-          href="/create-quiz"
-          className="inline-flex justify-center items-center bg-red-500 hover:bg-pink-600 mt-4 md:mt-0 px-4 py-2 rounded-full font-medium text-white transition-colors"
+          href="/dashboard/create-quiz"
+          className="inline-flex justify-center items-center bg-red-500 hover:bg-red-600 mt-4 md:mt-0 px-4 py-2 rounded-full font-medium text-white transition-colors"
         >
           <Plus className="mr-1 w-4 h-4" /> Créer un quiz
         </Link>
@@ -59,8 +59,8 @@ export default function MyQuizzesPage() {
       ) : isError ? (
         <div className="text-center py-12 text-red-500">Erreur lors du chargement des quiz.</div>
       ) : quizzes.length === 0 ? (
-        <div className="bg-pink-50 py-12 rounded-xl text-center">
-          <div className="inline-flex justify-center items-center bg-pink-100 mb-4 rounded-full w-12 h-12">
+        <div className="bg-red-50 py-12 rounded-xl text-center">
+          <div className="inline-flex justify-center items-center bg-red-100 mb-4 rounded-full w-12 h-12">
             <Plus className="w-6 h-6 text-red-500" />
           </div>
           <h3 className="mb-2 font-semibold text-xl">Aucun quiz pour l&apos;instant</h3>
@@ -68,7 +68,7 @@ export default function MyQuizzesPage() {
             Vous n&apos;avez pas encore créé de quiz. Créez votre premier quiz pour commencer !
           </p>
           <Link
-            href="/create-quiz"
+            href="/dashboard/create-quiz"
             className="inline-flex justify-center items-center bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
           >
             <Plus className="mr-1 w-4 h-4" /> Créer un quiz
@@ -79,13 +79,13 @@ export default function MyQuizzesPage() {
           {quizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className="bg-white shadow-sm hover:shadow-md border border-pink-100 rounded-xl overflow-hidden transition-all"
+              className="bg-white shadow-sm hover:shadow-md border border-red-100 rounded-xl overflow-hidden transition-all"
             >
               <div className="p-6">
                 <div className="flex md:flex-row flex-col justify-between md:items-center mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-block bg-pink-100 px-3 py-1 rounded-full font-medium text-pink-600 text-xs">
+                      <span className="inline-block bg-red-100 px-3 py-1 rounded-full font-medium text-red-600 text-xs">
                         {quiz.subject}
                       </span>
                       <span className="text-gray-500 text-xs">
@@ -110,7 +110,7 @@ export default function MyQuizzesPage() {
                         <Clock className="mr-1 w-4 h-4" /> {quiz.duration}
                       </div>
                       <div className="flex items-center">
-                        <Award className="mr-1 w-4 h-4 text-pink-500" /> {quiz.xpReward} XP
+                        <Award className="mr-1 w-4 h-4 text-red-500" /> {quiz.xpReward} XP
                       </div>
                       <div>{quiz.questions.length} questions</div>
                     </div>
@@ -120,7 +120,7 @@ export default function MyQuizzesPage() {
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center">
                     <span className="mr-2 text-gray-500 text-xs">Code du quiz :</span>
-                    <span className="bg-pink-50 px-2 py-1 rounded-md font-medium text-red-600 text-xs">
+                    <span className="bg-red-50 px-2 py-1 rounded-md font-medium text-red-600 text-xs">
                       {quiz.code}
                     </span>
                   </div>
@@ -140,7 +140,7 @@ export default function MyQuizzesPage() {
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={`/quiz-details/${quiz.code}`}
-                    className="inline-flex justify-center items-center bg-pink-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
+                    className="inline-flex justify-center items-center bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full font-medium text-white transition-colors"
                   >
                     <Eye className="mr-1 w-4 h-4" /> Voir le quiz
                   </Link>

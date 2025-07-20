@@ -309,9 +309,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </aside>
 
         <main className="flex-1 lg:ml-6">
-          <div className="lg:px-3 py-2 sm:py-3 lg:py-4">
             {children}
-          </div>
         </main>
       </div>
     </div>

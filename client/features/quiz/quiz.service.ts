@@ -26,12 +26,12 @@ export interface Quiz {
 
 export class QuizService extends BaseServiceImpl<Quiz, Partial<Quiz>> {
   protected endpoints = {
-    base: '/api/quizzes',
-    list: () => '/api/quizzes',
-    create: '/api/quizzes',
-    detail: (id: string) => `/api/quizzes/${id}`,
-    update: (id: string) => `/api/quizzes/${id}`,
-    delete: (id: string) => `/api/quizzes/${id}`,
+    base: '/quizzes',
+    list: () => '/quizzes',
+    create: '/quizzes',
+    detail: (id: string) => `/quizzes/${id}`,
+    update: (id: string) => `/quizzes/${id}`,
+    delete: (id: string) => `/quizzes/${id}`,
   };
   protected serializeParams(): string {
     return '';
