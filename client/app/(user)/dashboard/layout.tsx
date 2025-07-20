@@ -208,7 +208,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Layout Principal */}
       <div className="flex mt-4 sm:mt-6 lg:mt-10 px-4 sm:px-6 lg:px-8 xl:px-52">
         {/* Sidebar Desktop */}
-        <aside className="hidden lg:block w-80  rounded-lg shadow-sm border border-gray-100 h-fit">
+        <aside className="hidden lg:block w-72  rounded-lg shadow-sm border border-gray-100 h-fit">
           {/* Profile Section */}
           <div className='p-6 border bg-white border-red-100 mb-4'>
             <div className='flex lg:flex-row flex-col items-center gap-4'>

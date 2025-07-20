@@ -22,7 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SortableQuestion from "../components/sortable-question";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 interface QuizFormValues {
   title: string;
   instruction: string;
