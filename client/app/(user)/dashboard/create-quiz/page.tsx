@@ -1,12 +1,27 @@
 "use client";
 
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import { Plus, Save, Globe, Lock } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { quizService } from "@/features/quiz/quiz.service";
 import { toast } from "sonner";
-
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import SortableQuestion from "../sortable-question";
 interface QuizFormValues {
   title: string;
   instruction: string;
@@ -40,10 +55,32 @@ export default function CreateQuizPage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move, update } = useFieldArray({
     control,
     name: 'questions',
   });
+
+  // dnd-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Drag & drop handler
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      const oldIndex = fields.findIndex((item) => item.id === active.id);
+      const newIndex = fields.findIndex((item) => item.id === over?.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        move(oldIndex, newIndex);
+      }
+    }
+  };
 
   const createQuizMutation = useMutation({
     mutationFn: async (data: QuizFormValues) => {
@@ -180,56 +217,27 @@ export default function CreateQuizPage() {
                     <p className="text-gray-500">Aucune question ajoutée. Cliquez sur {"Ajouter une question."}</p>
                   </div>
                 )}
-                {fields.map((field, idx) => (
-                  <div key={field.id} className="border border-red-100 rounded-lg p-4 mb-4 bg-red-50">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      <div className="flex-1 space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Question</label>
-                        <input type="text" className="p-2 border border-gray-300 focus:border-red-500 rounded-lg w-full" {...register(`questions.${idx}.question`, { required: true })} />
-                        {errors.questions?.[idx]?.question && <span className="text-red-500 text-xs">Texte requis</span>}
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Points</label>
-                        <input type="number" className="p-2 border border-gray-300 focus:border-red-500 rounded-lg w-full" {...register(`questions.${idx}.points`, { required: true, min: 1 })} />
-                        {errors.questions?.[idx]?.points && <span className="text-red-500 text-xs">Points requis</span>}
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <label className="block text-sm font-medium text-gray-700">Options</label>
-                      <Controller
-                        control={control}
-                        name={`questions.${idx}.options`}
-                        render={({ field: optionsField }) => (
-                          <div className="space-y-2">
-                            {optionsField.value.map((opt, optIdx) => (
-                              <div key={optIdx} className="flex items-center gap-2">
-                                <input type="text" className="p-2 border border-gray-300 focus:border-red-500 rounded-lg w-full" value={opt} onChange={e => {
-                                  const newOptions = [...optionsField.value];
-                                  newOptions[optIdx] = e.target.value;
-                                  optionsField.onChange(newOptions);
-                                }} />
-                                <button type="button" onClick={() => {
-                                  const newOptions = optionsField.value.filter((_, i) => i !== optIdx);
-                                  optionsField.onChange(newOptions);
-                                }} className="text-red-500 text-xs font-bold">Supprimer</button>
-                              </div>
-                            ))}
-                            <button type="button" onClick={() => optionsField.onChange([...optionsField.value, ''])} className="text-red-500 text-xs font-bold">Ajouter une option</button>
-                          </div>
-                        )}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                  modifiers={[restrictToVerticalAxis]}
+                >
+                  <SortableContext
+                    items={fields.map((q) => q.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {fields.map((field, idx) => (
+                      <SortableQuestion
+                        key={field.id}
+                        field={field}
+                        index={idx}
+                        update={update}
+                        remove={remove}
                       />
-                      {errors.questions?.[idx]?.options && <span className="text-red-500 text-xs">Au moins 2 options</span>}
-                    </div>
-                    <div className="mt-2">
-                      <label className="block text-sm font-medium text-gray-700">Bonne réponse</label>
-                      <input type="text" className="p-2 border border-gray-300 focus:border-red-500 rounded-lg w-full" {...register(`questions.${idx}.answer`, { required: true })} />
-                      {errors.questions?.[idx]?.answer && <span className="text-red-500 text-xs">Réponse requise</span>}
-                    </div>
-                    <div className="flex justify-end mt-2">
-                      <button type="button" onClick={() => remove(idx)} className="text-red-500 text-xs font-bold">Supprimer la question</button>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                  </SortableContext>
+                </DndContext>
                 <div className="flex justify-end">
                   <button type="submit" disabled={isSubmitting || createQuizMutation.isPending} className={`inline-flex justify-center items-center bg-red-500 hover:bg-red-600 px-6 py-2 rounded-full font-medium text-white transition-colors ${isSubmitting || createQuizMutation.isPending ? 'opacity-70 cursor-not-allowed' : ''}`}>
                     {isSubmitting || createQuizMutation.isPending ? (

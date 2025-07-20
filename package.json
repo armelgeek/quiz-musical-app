@@ -57,6 +57,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@dnd-kit/utilities": "^3.2.2",
     "@mini_apps/utilities": "^0.0.3",
     "drizzle-orm": "^0.44.3",
     "hono": "4.5.0-rc.2",
