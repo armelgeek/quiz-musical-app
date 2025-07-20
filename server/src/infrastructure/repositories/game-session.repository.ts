@@ -1,10 +1,9 @@
-
+import { and, eq } from 'drizzle-orm'
 import { db } from '../database/db'
 import { gameSessions } from '../database/schema/game-session'
-import { eq, and } from 'drizzle-orm'
 import type { GameSession } from '../../domain/models/game-session.model'
-import type { GameSessionRepositoryInterface } from '../../domain/repositories/game-session.repository.interface'
 import type { Quiz } from '../../domain/models/quiz.model'
+import type { GameSessionRepositoryInterface } from '../../domain/repositories/game-session.repository.interface'
 
 export class GameSessionRepository implements GameSessionRepositoryInterface {
   async create(userId: number, quizzes: Quiz[]): Promise<GameSession> {
@@ -76,7 +75,7 @@ export class GameSessionRepository implements GameSessionRepositoryInterface {
 
   async findAllByUser(userId: number): Promise<GameSession[]> {
     const result = await db.select().from(gameSessions).where(eq(gameSessions.userId, userId))
-    return result.map(session => ({
+    return result.map((session) => ({
       id: session.id,
       userId: session.userId,
       quizzes: session.quizzes as Quiz[],

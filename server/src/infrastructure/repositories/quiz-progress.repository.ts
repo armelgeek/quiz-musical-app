@@ -17,10 +17,10 @@ export class DrizzleQuizProgressRepository implements QuizProgressRepository {
       currentQuestion: row.currentQuestion ?? 0,
       selectedAnswers: (() => {
         if (typeof row.selectedAnswers === 'object' && row.selectedAnswers !== null) {
-          return row.selectedAnswers as Record<string, string>;
+          return row.selectedAnswers as Record<string, string>
         } else {
-          const emptyAnswers: Record<string, string> = {};
-          return emptyAnswers;
+          const emptyAnswers: Record<string, string> = {}
+          return emptyAnswers
         }
       })(),
       timeLeft: row.timeLeft ?? 0,

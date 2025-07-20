@@ -68,7 +68,6 @@ export const activityLogs = pgTable('activity_logs', {
   ipAddress: varchar('ip_address', { length: 45 })
 })
 
-
 export const roles = pgTable('roles', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),

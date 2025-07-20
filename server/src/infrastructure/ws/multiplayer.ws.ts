@@ -1,6 +1,5 @@
 import { Server as SocketIOServer } from 'socket.io'
 import { MultiplayerRepository } from '../repositories/multiplayer.repository'
-import { QuizRepository } from '../repositories/quiz.repository'
 
 let io: SocketIOServer | null = null
 
@@ -21,35 +20,64 @@ export function attachMultiplayerSocket(server: any) {
   // const quizRepo = new QuizRepository() // (peut être utilisé pour enrichir les questions plus tard)
 
   io.on('connection', (socket) => {
-    // Join room
-    socket.on('join', (sessionId: string) => {
-      socket.join(sessionId)
-      socket.emit('joined', { sessionId })
-      // Optionally send current game state
-      if (liveGames[sessionId]) {
-        socket.emit('game_state', liveGames[sessionId].publicState())
+    // Authentification simple : le client doit envoyer son userId dès la connexion
+    let userId: string | null = null
+    socket.on('auth', (data) => {
+      if (typeof data?.userId === 'string' && data.userId.length > 0) {
+        userId = data.userId
+        socket.data.userId = userId
+        socket.emit('authenticated', { userId })
+      } else {
+        socket.emit('unauthorized', { error: 'userId required' })
+        socket.disconnect()
       }
     })
+
+    function requireAuth(cb: (...args: any[]) => void) {
+      return (...args: any[]) => {
+        if (!userId) {
+          socket.emit('unauthorized', { error: 'Not authenticated' })
+          return
+        }
+        cb(...args)
+      }
+    }
+
+    // Join room
+    socket.on(
+      'join',
+      requireAuth((sessionId: string) => {
+        socket.join(sessionId)
+        socket.emit('joined', { sessionId })
+        if (liveGames[sessionId]) {
+          socket.emit('game_state', liveGames[sessionId].publicState())
+        }
+      })
+    )
 
     // L'admin lance la partie
-    socket.on('start_game', async ({ sessionId }) => {
-      // Récupérer la session et les questions
-      const session = await multiplayerRepo.getSession(Number(sessionId))
-      if (!session) return
-      const questions = Array.isArray(session.questions) ? session.questions : []
-      if (!questions.length) return
-      // Initialiser l'état en mémoire
-      if (io) {
-        liveGames[sessionId] = createLiveGame(sessionId, questions, io)
-        liveGames[sessionId].start()
-      }
-    })
+    socket.on(
+      'start_game',
+      requireAuth(async ({ sessionId }) => {
+        const session = await multiplayerRepo.getSession(Number(sessionId))
+        if (!session) return
+        const questions = Array.isArray(session.questions) ? session.questions : []
+        if (!questions.length) return
+        if (io) {
+          liveGames[sessionId] = createLiveGame(sessionId, questions, io)
+          liveGames[sessionId].start()
+        }
+      })
+    )
 
     // Réponse d'un joueur
-    socket.on('answer', ({ sessionId, userId, answer }) => {
-      const game = liveGames[sessionId]
-      if (game) game.receiveAnswer(userId, answer)
-    })
+    socket.on(
+      'answer',
+      requireAuth(({ sessionId, userId: answerUserId, answer }) => {
+        const game = liveGames[sessionId]
+        if (game) game.receiveAnswer(answerUserId, answer)
+      })
+    )
 
     socket.on('disconnect', () => {
       // Optionnel : gestion des déconnexions

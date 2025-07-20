@@ -16,7 +16,7 @@ export const quizzes = pgTable('quizzes', {
     .notNull()
     .references(() => users.id),
   isPublic: boolean('is_public').default(true),
-  questions: jsonb('questions').notNull(), 
+  questions: jsonb('questions').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 })
@@ -30,7 +30,7 @@ export const quizProgress = pgTable('quiz_progress', {
     .notNull()
     .references(() => users.id),
   currentQuestion: integer('current_question').default(0),
-  selectedAnswers: jsonb('selected_answers'), 
+  selectedAnswers: jsonb('selected_answers'),
   timeLeft: integer('time_left'),
   updatedAt: timestamp('updated_at').defaultNow()
 })

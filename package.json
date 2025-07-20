@@ -48,17 +48,20 @@
   ],
   "devDependencies": {
     "@types/redis": "^4.0.11",
+    "@types/socket.io": "^3.0.2",
     "bun-types": "latest",
-    "concurrently": "^8.0.0"
+    "concurrently": "^8.0.0",
+    "socket.io": "^4.8.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "@mini_apps/utilities": "^0.0.3",
+    "drizzle-orm": "^0.44.3",
     "hono": "4.5.0-rc.2",
+    "pg": "^8.16.3",
     "react-quill": "^2.0.0",
-    "redis": "^5.6.0",
-    "socket.io": "^4.8.1"
+    "redis": "^5.6.0"
   }
 }

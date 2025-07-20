@@ -1,8 +1,8 @@
 import { and, eq, not } from 'drizzle-orm'
 import { db } from '@/infrastructure/database/db'
 import { users } from '@/infrastructure/database/schema'
-import type { Action, Subject } from '@/domain/types/permission.type'
 import { roleResources, roles, userRoles } from '@/infrastructure/database/schema/auth'
+import type { Action, Subject } from '@/domain/types/permission.type'
 
 export class PermissionService {
   async getUserRolesWithPermissions(userId: string) {

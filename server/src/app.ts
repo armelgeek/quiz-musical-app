@@ -41,7 +41,7 @@ export class App {
     this.app.basePath('/api').route('/', router)
     this.app.route('/', Home)
 
-  // WebSocket handled by Socket.IO at the server level
+    // WebSocket handled by Socket.IO at the server level
   }
 
   private initializeGlobalMiddlewares() {

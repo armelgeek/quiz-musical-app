@@ -2,7 +2,5 @@
   "name": "bhvr-site-server",
   "main": "src/index.ts",
   "compatibility_date": "2025-02-13",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "compatibility_flags": ["nodejs_compat"]
 }

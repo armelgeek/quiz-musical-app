@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { and, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray } from 'drizzle-orm'
 import { createClient } from 'redis'
 import type { QuizRepositoryInterface } from '@/domain/repositories/quiz.repository.interface'
 import { db } from '../database/db'
@@ -31,7 +31,7 @@ export class QuizRepository implements QuizRepositoryInterface {
       code: row.code,
       createdBy: row.createdBy,
       isPublic: row.isPublic ?? true,
-  questions: Array.isArray(row.questions) ? (row.questions as QuizQuestion[]) : ([] as QuizQuestion[]),
+      questions: Array.isArray(row.questions) ? (row.questions as QuizQuestion[]) : ([] as QuizQuestion[]),
       createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : '',
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : ''
     }
@@ -71,7 +71,7 @@ export class QuizRepository implements QuizRepositoryInterface {
     const [updated] = await db
       .update(quizzes)
       .set(allowed)
-  .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
+      .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
       .returning()
     return updated ? this.mapDbQuiz(updated) : null
   }
@@ -79,7 +79,7 @@ export class QuizRepository implements QuizRepositoryInterface {
   async deleteQuiz(quizId: number, userId: string) {
     const deleted = await db
       .delete(quizzes)
-  .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
+      .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
       .returning()
     return !!deleted.length
   }
@@ -88,7 +88,7 @@ export class QuizRepository implements QuizRepositoryInterface {
     const [updated] = await db
       .update(quizzes)
       .set({ isPublic })
-  .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
+      .where(and(eq(quizzes.id, quizId), eq(quizzes.createdBy, userId)))
       .returning()
     return updated ? this.mapDbQuiz(updated) : null
   }

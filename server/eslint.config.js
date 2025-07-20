@@ -7,11 +7,25 @@ export default config(
       rules: {
         'import/no-default-export': 'off'
       }
+    },
+    {
+      files: ['drizzle/**/*'],
+      rules: {
+        'unicorn/filename-case': 'off',
+        'no-console': 'off'
+      }
+    },
+    {
+      files: ['docs/**/*'],
+      rules: {
+        'unicorn/filename-case': 'off',
+        'no-console': 'off'
+      }
     }
   ],
   {
     prettier: true,
-    markdown: true,
-    ignorePatterns: ['docs']
+    markdown: false,
+    ignorePatterns: ['docs/**', 'drizzle/**']
   }
 )

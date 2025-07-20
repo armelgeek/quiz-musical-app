@@ -1,4 +1,3 @@
-import type { BadgeType, UserBadgeType } from '@/domain/models/badge.model'
 import type { UserRepositoryInterface } from '@/domain/repositories/user.repository.interface'
 import type { BadgeRepository } from '@/infrastructure/repositories/badge.repository'
 
