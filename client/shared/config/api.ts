@@ -6,5 +6,8 @@ export const API_ENDPOINTS = {
   user: {
     rank: "/rank"
   },
+  stats: {
+    user: "/v1/stats/user"
+  },
   quizzes: "/quizzes",
 };

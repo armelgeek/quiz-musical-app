@@ -1,3 +1,4 @@
+export * from './stats.controller'
 export * from './quiz-results.controller'
 export * from './quiz-progress.controller'
 export * from './user.controller'

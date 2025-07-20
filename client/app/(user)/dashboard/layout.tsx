@@ -22,6 +22,7 @@ import { Logo } from "@/shared/components/atoms/ui/logo";
 import Image from 'next/image';
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useRank } from "@/shared/providers/rank-provider";
+import { useUserStats } from '@/features/user/hooks/use-user-stats';
 
 interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -41,6 +42,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { logout } = useAuth();
   const { user } = useUserInfo();
   const { calculateNextLevelXP } = useRank();
+  const { data: stats } = useUserStats();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -262,7 +264,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <div className='flex flex-col justify-center items-center bg-red-50 p-4 rounded-lg'>
                 <BookOpen className='mb-2 w-6 h-6 text-red-500' />
                 <span className='font-bold text-xl'>
-                  0
+                  {stats?.quizzesCompleted ?? 0}
                 </span>
                 <span className='text-gray-500 text-xs'>
                  Completed
@@ -270,7 +272,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
               <div className='flex flex-col justify-center items-center bg-red-50 p-4 rounded-lg'>
                 <Trophy className='mb-2 w-6 h-6 text-red-500' />
-                <span className='font-bold text-xl'>0</span>
+                <span className='font-bold text-xl'>{stats?.achievements?.length ?? 0}</span>
                 <span className='text-gray-500 text-xs'>Achievements</span>
               </div>
             </div>
